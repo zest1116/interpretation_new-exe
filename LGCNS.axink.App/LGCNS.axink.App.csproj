@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>axink</AssemblyName>
+    <ApplicationIcon>LGCNS.DesktopAudioHub.App.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="LGCNS.DesktopAudioHub.App.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3856.49" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LGCNS.axink.App.Services\LGCNS.axink.App.Services.csproj" />
+    <ProjectReference Include="..\LGCNS.axink.Audio\LGCNS.axink.Audio.csproj" />
+    <ProjectReference Include="..\LGCNS.axink.Common\LGCNS.axink.Common.csproj" />
+    <ProjectReference Include="..\LGCNS.axink.Medels\LGCNS.axink.Medels.csproj" />
+    <ProjectReference Include="..\LGCNS.axink.WebHosting\LGCNS.axink.WebHosting.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\LGCNS.DesktopAudioHub.App.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+</Project>

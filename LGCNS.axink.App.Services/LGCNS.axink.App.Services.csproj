@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LGCNS.axink.Audio\LGCNS.axink.Audio.csproj" />
+    <ProjectReference Include="..\LGCNS.axink.Common\LGCNS.axink.Common.csproj" />
+    <ProjectReference Include="..\LGCNS.axink.WebHosting\LGCNS.axink.WebHosting.csproj" />
+  </ItemGroup>
+
+</Project>
