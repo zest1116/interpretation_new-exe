@@ -1,6 +1,6 @@
 ﻿using LGCNS.axink.Audio.Recording;
 using LGCNS.axink.Common.Monitors;
-using LGCNS.axink.Medels.Settings;
+using LGCNS.axink.Models.Settings;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 

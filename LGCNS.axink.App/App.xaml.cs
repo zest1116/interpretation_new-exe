@@ -7,8 +7,8 @@ using LGCNS.axink.Audio.Devices;
 using LGCNS.axink.Common;
 using LGCNS.axink.Common.Interfaces;
 using LGCNS.axink.Common.Monitors;
-using LGCNS.axink.Medels.Devices;
-using LGCNS.axink.Medels.Settings;
+using LGCNS.axink.Models.Devices;
+using LGCNS.axink.Models.Settings;
 using LGCNS.axink.WebHosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
@@ -204,6 +204,26 @@ namespace LGCNS.axink.App
 
             // 저장만 해주면 됨 (다른 서비스는 systemMon.Current로 접근)
             systemMon.UpdateAndSave(defaults);
+        }
+
+        public static int ShowMeMessage => WM_SHOWME;
+
+        public static bool? ShowWebViewSourceSettingsDialog(Window owner)
+        {
+            var win = _serviceProvider.GetRequiredService<AppSettingsWindow>();
+            win.Owner = owner;
+            return win.ShowDialog();
+        }
+
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            if (_server != null)
+                await _server.StopAsync();
+            Logging.Info("앱 종료");
+            Serilog.Log.CloseAndFlush();
+            _serviceProvider?.Dispose();
+
+            base.OnExit(e);
         }
     }
 

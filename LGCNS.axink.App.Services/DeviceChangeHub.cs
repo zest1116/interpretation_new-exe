@@ -1,13 +1,8 @@
 ﻿using LGCNS.axink.Audio.Devices;
 using LGCNS.axink.Common;
-using LGCNS.axink.Medels.Devices;
-using LGCNS.axink.WebHosting;
+using LGCNS.axink.Common.Interfaces;
+using LGCNS.axink.Models.Devices;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LGCNS.axink.App.Services
 {

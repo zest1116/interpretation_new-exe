@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LGCNS.axink.Medels.Devices
+namespace LGCNS.axink.Models.Devices
 {
     public sealed record AudioDeviceDto(string Id, string Name, bool IsDefault);
 

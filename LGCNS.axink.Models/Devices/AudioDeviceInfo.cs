@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LGCNS.axink.Medels.Devices
+namespace LGCNS.axink.Models.Devices
 {
     /// <summary>
     /// 오디오 장치 정보

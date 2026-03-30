@@ -1,12 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LGCNS.axink.Common.Monitors;
-using LGCNS.axink.Medels.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LGCNS.axink.Models.Settings;
 
 namespace LGCNS.axink.App.ViewModels
 {

@@ -2,10 +2,10 @@
 using LGCNS.axink.Audio.Capture;
 using LGCNS.axink.Audio.Devices;
 using LGCNS.axink.Common;
+using LGCNS.axink.Common.Interfaces;
 using LGCNS.axink.Common.Monitors;
-using LGCNS.axink.Medels.Messages;
-using LGCNS.axink.Medels.Settings;
-using LGCNS.axink.WebHosting;
+using LGCNS.axink.Models.Messages;
+using LGCNS.axink.Models.Settings;
 using LGCNS.axink.WebHosting.Communication;
 using LGCNS.axink.WebHosting.Contracts;
 using Newtonsoft.Json;

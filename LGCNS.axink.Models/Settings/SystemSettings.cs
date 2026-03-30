@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace LGCNS.axink.Medels.Settings
+namespace LGCNS.axink.Models.Settings
 {
     public enum SaveOption
     {

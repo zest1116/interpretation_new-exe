@@ -1,5 +1,5 @@
 ﻿using LGCNS.axink.Audio.Devices;
-using LGCNS.axink.Medels.Devices;
+using LGCNS.axink.Models.Devices;
 using System;
 using System.Collections.Generic;
 using System.Linq;

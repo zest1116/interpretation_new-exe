@@ -3,6 +3,6 @@
   <Project Path="LGCNS.axink.App/LGCNS.axink.App.csproj" />
   <Project Path="LGCNS.axink.Audio/LGCNS.axink.Audio.csproj" Id="b9f60997-cb6e-43a5-adba-285a0031c454" />
   <Project Path="LGCNS.axink.Common/LGCNS.axink.Common.csproj" Id="35a1b009-1c90-4701-b384-bb8467fe4442" />
-  <Project Path="LGCNS.axink.Medels/LGCNS.axink.Medels.csproj" Id="e55eda74-69a0-4ece-84d4-a69560c88f99" />
+  <Project Path="LGCNS.axink.Models/LGCNS.axink.Models.csproj" Id="e55eda74-69a0-4ece-84d4-a69560c88f99" />
   <Project Path="LGCNS.axink.WebHosting/LGCNS.axink.WebHosting.csproj" Id="65e0a712-ec4f-4903-9354-0248ba66ea36" />
 </Solution>

@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LGCNS.axink.Audio\LGCNS.axink.Audio.csproj" />
     <ProjectReference Include="..\LGCNS.axink.Common\LGCNS.axink.Common.csproj" />
+    <ProjectReference Include="..\LGCNS.axink.Models\LGCNS.axink.Models.csproj" />
     <ProjectReference Include="..\LGCNS.axink.WebHosting\LGCNS.axink.WebHosting.csproj" />
   </ItemGroup>
 

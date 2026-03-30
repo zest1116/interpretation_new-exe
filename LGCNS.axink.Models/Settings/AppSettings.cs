@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LGCNS.axink.Medels.Settings
+namespace LGCNS.axink.Models.Settings
 {
     public sealed class AppSettings
     {

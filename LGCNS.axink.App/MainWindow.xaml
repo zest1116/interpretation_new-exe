@@ -156,7 +156,8 @@
                         Background="{StaticResource ContentBackgroundBrush}"
                         CornerRadius="0,0,10,10"
                         ClipToBounds="True">
-                    <StackPanel VerticalAlignment="Center"
+                    <wv2:WebView2 x:Name="WebView" HorizontalAlignment="Stretch"   VerticalAlignment="Stretch"/>
+                    <!--<StackPanel VerticalAlignment="Center"
                         HorizontalAlignment="Center">
                         <Ellipse Width="56" Height="56"
                          Stroke="#DADCE0" StrokeThickness="1.5"
@@ -165,7 +166,7 @@
                         <TextBlock Text="WebView2 content area"
                            Foreground="#9AA0A6" FontSize="13"
                            HorizontalAlignment="Center"/>
-                    </StackPanel>
+                    </StackPanel>-->
                 </Border>
             </Grid>
         </Border>

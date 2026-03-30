@@ -1,9 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using LGCNS.axink.App.Services;
+using LGCNS.axink.Common;
 using LGCNS.axink.Common.Monitors;
-using LGCNS.axink.Medels.Settings;
+using LGCNS.axink.Models.Settings;
 using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,13 +30,48 @@ namespace LGCNS.axink.App
 
         #endregion
 
+        private readonly ISettingsMonitor<SystemSettings> _sysSettings;
+        private readonly ISettingsMonitor<AppSettings> _appSettings;
+        private readonly IMessenger _messenger;
+        private readonly DeviceChangeHub _deviceChangeHub;
+
         public MainWindow(ISettingsMonitor<SystemSettings> sysSettings, ISettingsMonitor<AppSettings> appSettings, IMessenger messenger, DeviceChangeHub hub)
         {
             InitializeComponent();
 
+            _sysSettings = sysSettings;
+            _appSettings = appSettings;
+            _messenger = messenger;
+            _deviceChangeHub = hub;
+            _deviceChangeHub.DeviceListChanged += DeviceChangeHub_DeviceListChanged;
+
             SourceInitialized += MainWindow_SourceInitialized;
             Loaded += MainWindow_Loaded;
             StateChanged += MainWindow_StateChanged;
+
+            _messenger.Register<SettingsChangedMessage<AppSettings>>(this, (_, msg) =>
+            {
+                NavigateIfPossible(msg.Value.WebViewSource);
+            });
+        }
+
+        private void DeviceChangeHub_DeviceListChanged(object? sender, DeviceListChangedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+
+                if (WebView?.CoreWebView2 != null)
+                {
+                    var data = new
+                    {
+                        type = "deviceChanged",
+                        data = JsonConvert.DeserializeObject(e.Devices)
+                    };
+                    Logging.Debug(JsonConvert.SerializeObject(data));
+                    WebView.CoreWebView2.PostWebMessageAsJson(JsonConvert.SerializeObject(data));
+                }
+            });
+
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -42,6 +80,20 @@ namespace LGCNS.axink.App
             {
                 //await WebView.EnsureCoreWebView2Async();
                 //WebView.Source = new Uri("https://example.com");
+
+                await InitializeWebView2Async();
+
+                // 1) MainWindow 시작 시 저장된 WebViewSource가 없으면 팝업
+                if (string.IsNullOrWhiteSpace(_appSettings.Current.WebViewSource))
+                {
+                    var ok = App.ShowWebViewSourceSettingsDialog(this);
+                    if (ok != true)
+                    {
+                        // 정책: 필수값이므로 취소하면 종료(원하면 그냥 빈 화면 유지로 변경 가능)
+                        Close();
+                        return;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -50,6 +102,49 @@ namespace LGCNS.axink.App
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+        }
+
+        private async Task InitializeWebView2Async()
+        {
+            try
+            {
+                WebView.CoreWebView2InitializationCompleted += WebView_CoreWebView2InitializationCompleted;
+                var userDataFolder = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    Consts.APP_COMPANY, Consts.APP_NAME, "WebView2"
+                );
+
+                Directory.CreateDirectory(userDataFolder);
+
+                var env = await CoreWebView2Environment.CreateAsync(
+                    userDataFolder: userDataFolder
+                );
+
+                await WebView.EnsureCoreWebView2Async(env);
+                NavigateIfPossible(_appSettings.Current.WebViewSource);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"WebView2 초기화 실패: {ex.Message}");
+            }
+        }
+
+        private void WebView_CoreWebView2InitializationCompleted(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
+        {
+            WebView.CoreWebView2.Settings.UserAgent = "wpf-axink";
+        }
+
+        private void NavigateIfPossible(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return;
+
+            var trimmed = url.Trim();
+            if (!Uri.TryCreate(trimmed, UriKind.Absolute, out var uri))
+                return;
+
+            WebView.Source = uri;
+
         }
 
         private void MainWindow_SourceInitialized(object? sender, EventArgs e)

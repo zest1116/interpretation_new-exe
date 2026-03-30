@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LGCNS.axink.WebHosting
+namespace LGCNS.axink.Common
 {
     public enum WsPayloadKind { Binary, Text }
 

@@ -1,4 +1,6 @@
 ﻿using LGCNS.axink.Audio.Devices;
+using LGCNS.axink.Common;
+using LGCNS.axink.Common.Interfaces;
 using LGCNS.axink.WebHosting.Communication;
 using LGCNS.axink.WebHosting.Endpoints;
 using Microsoft.AspNetCore.Builder;
@@ -41,7 +43,7 @@ namespace LGCNS.axink.WebHosting
             // 내부 기본 서비스 (EventBus, AudioHub)
             builder.Services.AddSingleton<IEventBus, ChannelEventBus>();
             builder.Services.AddSingleton<IChannelAudioHub, ChannelAudioHub>();
-            builder.Services.AddSingleton<DeviceManger>();
+            //builder.Services.AddSingleton<DeviceManger>();
             builder.Services.AddSingleton<WebSocketConnectionCounter>();
 
             // WPF에서 제공하는 서비스 주입 (DeviceService/SettingsService/AudioControlService 등)

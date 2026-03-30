@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace LGCNS.axink.Medels.Messages
+namespace LGCNS.axink.Models.Messages
 {
     /// <summary>
     /// STT Stream전송 초기메세지
