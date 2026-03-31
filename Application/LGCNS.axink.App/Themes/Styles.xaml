@@ -120,7 +120,7 @@
 
                                     <Border Background="White"
                                         BorderBrush="{StaticResource MenuPopupBorderBrush}"
-                                        BorderThickness="1"
+                                        BorderThickness="0.5"
                                         CornerRadius="6"
                                         Padding="4"
                                         Margin="0,4,0,0">
@@ -172,6 +172,7 @@
                         <Grid>
                             <ContentPresenter ContentSource="Header"
                                           RecognizesAccessKey="True"
+                                              Margin="12,0,12,0"
                                           VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
@@ -180,6 +181,20 @@
                             <Setter TargetName="SubRoot" Property="Background" Value="{StaticResource MenuHoverBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SubMenuSeparatorStyle" TargetType="Separator">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Height="0.5"
+                        Margin="0"
+                        Background="#D9D9D9"
+                        SnapsToDevicePixels="True"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

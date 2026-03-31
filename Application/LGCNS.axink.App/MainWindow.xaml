@@ -161,7 +161,7 @@
                           VerticalAlignment="Center">
                         <MenuItem Header="_파일" Style="{StaticResource MenuItemTopLevelStyle}">
                             <MenuItem Header="환경설정" Style="{StaticResource SubMenuItemStyle}" Click="Config_Click"/>
-                            <Separator/>
+                            <Separator Style="{StaticResource SubMenuSeparatorStyle}"/>
                             <MenuItem Header="종료" Style="{StaticResource SubMenuItemStyle}" Click="Exit_Click"/>
                         </MenuItem>
                     </Menu>
