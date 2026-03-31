@@ -19,7 +19,7 @@
         UseLayoutRounding="True">
 
     <shell:WindowChrome.WindowChrome>
-        <shell:WindowChrome CaptionHeight="34"
+        <shell:WindowChrome CaptionHeight="32"
                             ResizeBorderThickness="8"
                             GlassFrameThickness="0"
                             CornerRadius="0"
@@ -39,7 +39,7 @@
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="34"/>
+                    <RowDefinition Height="32"/>
                     <RowDefinition Height="32"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
@@ -48,7 +48,7 @@
                 <Border x:Name="TitleBarBorder"
                         Grid.Row="0"
                         Background="{StaticResource TitleBarBrush}"
-                        BorderThickness="0,0,0,0"
+                        BorderThickness="0"
                         CornerRadius="10,10,0,0">
                     <Grid x:Name="TitleBar"
                           MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
@@ -59,41 +59,52 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- 좌측 앱 아이콘 + 제목 -->
-                        <StackPanel Grid.Column="0" Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    Margin="10,0,0,0"
-                                    shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                            <Image x:Name="AppIconImage"
-                                   Width="25"
-                                   Height="25"
-                                   Margin="0,0,8,0"
-                                   Stretch="Uniform"
-                                   Source="/Assets/LGCNS.DesktopAudioHub.App.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                        <Grid x:Name="TitleLeftHost"
+                              Grid.Column="0"
+                              VerticalAlignment="Stretch"
+                              shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        Margin="12,0,0,0">
+                                <Border Width="16"
+                                        Height="16"
+                                        VerticalAlignment="Center"
+                                        Background="Transparent">
+                                    <Image x:Name="AppIconImage"
+                                           Width="16"
+                                           Height="16"
+                                           Stretch="Uniform"
+                                           Source="/Assets/LGCNS.DesktopAudioHub.App.png"
+                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                </Border>
 
-                            <TextBlock Text="a:xink Translator"
-                                       VerticalAlignment="Center"
-                                       Foreground="{StaticResource TitleForegroundBrush}"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"/>
-                        </StackPanel>
+                                <TextBlock Text="a:xink Translator"
+                                           Margin="8,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource TitleForegroundBrush}"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
 
                         <!-- 드래그 영역 -->
-                        <Grid Grid.Column="1" Background="Transparent"/>
+                        <Grid Grid.Column="1"
+                              Background="Transparent"/>
 
                         <!-- 우측 버튼 -->
-                        <StackPanel Grid.Column="2"
+                        <StackPanel x:Name="CaptionButtonsHost"
+                                    Grid.Column="2"
                                     Orientation="Horizontal"
                                     HorizontalAlignment="Right"
+                                    VerticalAlignment="Stretch"
                                     shell:WindowChrome.IsHitTestVisibleInChrome="True">
 
                             <!-- 최소화 -->
                             <Button Style="{StaticResource CaptionButtonStyle}"
                                     Click="Minimize_Click">
-                                <Grid Width="10" Height="10">
-                                    <Rectangle Height="1.2"
+                                <Grid Width="10" Height="10" Margin="0,-1,0,0">
+                                    <Rectangle Height="1"
                                                Width="10"
-                                               RadiusX="0"
-                                               RadiusY="0"
                                                VerticalAlignment="Center"
                                                Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                                 </Grid>
@@ -103,34 +114,25 @@
                             <Button x:Name="MaxBtn"
                                     Style="{StaticResource CaptionButtonStyle}"
                                     Click="Maximize_Click">
-                                <Grid Width="10" Height="10">
-                                    <!-- 최대화 -->
-                                    <Rectangle x:Name="MaximizeGlyph"
-                                               Width="9"
-                                               Height="9"
-                                               StrokeThickness="1"
-                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                               Fill="Transparent"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
+                                <Grid Width="10" Height="10" Margin="0,-1,0,0">
+                                    <Path x:Name="MaximizeGlyph"
+                                          Data="M1.5,1.5 L8.5,1.5 L8.5,8.5 L1.5,8.5 Z"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="1"
+                                          SnapsToDevicePixels="True"
+                                          Stretch="Fill"/>
 
-                                    <!-- 복원 -->
                                     <Grid x:Name="RestoreGlyph" Visibility="Collapsed">
-                                        <Rectangle Width="7"
-                                                   Height="7"
-                                                   Margin="0,2,2,0"
-                                                   HorizontalAlignment="Right"
-                                                   VerticalAlignment="Top"
-                                                   StrokeThickness="1"
-                                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                                   Fill="Transparent"/>
-                                        <Rectangle Width="7"
-                                                   Height="7"
-                                                   HorizontalAlignment="Left"
-                                                   VerticalAlignment="Bottom"
-                                                   StrokeThickness="1"
-                                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                                   Fill="Transparent"/>
+                                        <Path Data="M3,1.5 L8.5,1.5 L8.5,7"
+                                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                              StrokeThickness="1"
+                                              Fill="Transparent"
+                                              SnapsToDevicePixels="True"/>
+                                        <Path Data="M1.5,3 L7,3 L7,8.5 L1.5,8.5 Z"
+                                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                              StrokeThickness="1"
+                                              Fill="Transparent"
+                                              SnapsToDevicePixels="True"/>
                                     </Grid>
                                 </Grid>
                             </Button>
@@ -138,10 +140,10 @@
                             <!-- 닫기 -->
                             <Button Style="{StaticResource CloseButtonStyle}"
                                     Click="Close_Click">
-                                <Grid Width="10" Height="10">
+                                <Grid Width="10" Height="10" Margin="0,-1,0,0">
                                     <Path Data="M 1,1 L 9,9 M 9,1 L 1,9"
                                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                          StrokeThickness="1.2"
+                                          StrokeThickness="1.1"
                                           StrokeStartLineCap="Square"
                                           StrokeEndLineCap="Square"
                                           SnapsToDevicePixels="True"/>
@@ -152,9 +154,11 @@
                 </Border>
 
                 <!-- Menu Bar -->
-                <Border Grid.Row="1" Background="{StaticResource MenuBarBrush}"
-                    Padding="4,0,0,0">
-                    <Menu Style="{StaticResource MenuBarStyle}" VerticalAlignment="Center">
+                <Border Grid.Row="1"
+                        Background="{StaticResource MenuBarBrush}"
+                        Padding="4,0,0,0">
+                    <Menu Style="{StaticResource MenuBarStyle}"
+                          VerticalAlignment="Center">
                         <MenuItem Header="_파일" Style="{StaticResource MenuItemTopLevelStyle}">
                             <MenuItem Header="환경설정" Style="{StaticResource SubMenuItemStyle}" Click="Config_Click"/>
                             <Separator/>
@@ -169,17 +173,9 @@
                         Background="{StaticResource ContentBackgroundBrush}"
                         CornerRadius="0,0,10,10"
                         ClipToBounds="True">
-                    <wv2:WebView2 x:Name="WebView" HorizontalAlignment="Stretch"   VerticalAlignment="Stretch"/>
-                    <!--<StackPanel VerticalAlignment="Center"
-                        HorizontalAlignment="Center">
-                        <Ellipse Width="56" Height="56"
-                         Stroke="#DADCE0" StrokeThickness="1.5"
-                         HorizontalAlignment="Center"
-                         Margin="0,0,0,12"/>
-                        <TextBlock Text="WebView2 content area"
-                           Foreground="#9AA0A6" FontSize="13"
-                           HorizontalAlignment="Center"/>
-                    </StackPanel>-->
+                    <wv2:WebView2 x:Name="WebView"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"/>
                 </Border>
             </Grid>
         </Border>

@@ -8,11 +8,11 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 
 namespace LGCNS.axink.App
 {
@@ -22,11 +22,55 @@ namespace LGCNS.axink.App
         private const int DWMWCP_DONOTROUND = 1;
         private const int DWMWCP_ROUND = 2;
 
+        private const int WM_GETMINMAXINFO = 0x0024;
+        private const int MONITOR_DEFAULTTONEAREST = 0x00000002;
 
         #region WIN32 메시지
 
         [DllImport("dwmapi.dll")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MINMAXINFO
+        {
+            public POINT ptReserved;
+            public POINT ptMaxSize;
+            public POINT ptMaxPosition;
+            public POINT ptMinTrackSize;
+            public POINT ptMaxTrackSize;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private struct MONITORINFO
+        {
+            public int cbSize;
+            public RECT rcMonitor;
+            public RECT rcWork;
+            public int dwFlags;
+        }
 
         #endregion
 
@@ -35,7 +79,11 @@ namespace LGCNS.axink.App
         private readonly IMessenger _messenger;
         private readonly DeviceChangeHub _deviceChangeHub;
 
-        public MainWindow(ISettingsMonitor<SystemSettings> sysSettings, ISettingsMonitor<AppSettings> appSettings, IMessenger messenger, DeviceChangeHub hub)
+        public MainWindow(
+            ISettingsMonitor<SystemSettings> sysSettings,
+            ISettingsMonitor<AppSettings> appSettings,
+            IMessenger messenger,
+            DeviceChangeHub hub)
         {
             InitializeComponent();
 
@@ -59,7 +107,6 @@ namespace LGCNS.axink.App
         {
             Dispatcher.Invoke(() =>
             {
-
                 if (WebView?.CoreWebView2 != null)
                 {
                     var data = new
@@ -67,40 +114,34 @@ namespace LGCNS.axink.App
                         type = "deviceChanged",
                         data = JsonConvert.DeserializeObject(e.Devices)
                     };
+
                     Logging.Debug(JsonConvert.SerializeObject(data));
                     WebView.CoreWebView2.PostWebMessageAsJson(JsonConvert.SerializeObject(data));
                 }
             });
-
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                //await WebView.EnsureCoreWebView2Async();
-                //WebView.Source = new Uri("https://example.com");
-
                 await InitializeWebView2Async();
 
-                // 1) MainWindow 시작 시 저장된 WebViewSource가 없으면 팝업
                 if (string.IsNullOrWhiteSpace(_appSettings.Current.WebViewSource))
                 {
                     var ok = App.ShowWebViewSourceSettingsDialog(this);
                     if (ok != true)
                     {
-                        // 정책: 필수값이므로 취소하면 종료(원하면 그냥 빈 화면 유지로 변경 가능)
                         Close();
                         return;
                     }
                 }
+
+                UpdateVisualState();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message,
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -109,18 +150,18 @@ namespace LGCNS.axink.App
             try
             {
                 WebView.CoreWebView2InitializationCompleted += WebView_CoreWebView2InitializationCompleted;
-                var userDataFolder = System.IO.Path.Combine(
+
+                var userDataFolder = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    Consts.APP_COMPANY, Consts.APP_NAME, "WebView2"
-                );
+                    Consts.APP_COMPANY,
+                    Consts.APP_NAME,
+                    "WebView2");
 
                 Directory.CreateDirectory(userDataFolder);
 
-                var env = await CoreWebView2Environment.CreateAsync(
-                    userDataFolder: userDataFolder
-                );
-
+                var env = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
                 await WebView.EnsureCoreWebView2Async(env);
+
                 NavigateIfPossible(_appSettings.Current.WebViewSource);
             }
             catch (Exception ex)
@@ -129,7 +170,7 @@ namespace LGCNS.axink.App
             }
         }
 
-        private void WebView_CoreWebView2InitializationCompleted(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
+        private void WebView_CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             WebView.CoreWebView2.Settings.UserAgent = "wpf-axink";
         }
@@ -144,7 +185,6 @@ namespace LGCNS.axink.App
                 return;
 
             WebView.Source = uri;
-
         }
 
         private void MainWindow_SourceInitialized(object? sender, EventArgs e)
@@ -221,9 +261,9 @@ namespace LGCNS.axink.App
         {
             bool maximized = WindowState == WindowState.Maximized;
 
-            MainFrame.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(12);
-            TitleBarBorder.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(12, 12, 0, 0);
-            ContentBorder.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(0, 0, 12, 12);
+            MainFrame.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(10);
+            TitleBarBorder.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(10, 10, 0, 0);
+            ContentBorder.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(0, 0, 10, 10);
             MainFrame.Margin = maximized ? new Thickness(0) : new Thickness(1);
 
             if (MaximizeGlyph != null && RestoreGlyph != null)
@@ -248,7 +288,38 @@ namespace LGCNS.axink.App
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+            if (msg == WM_GETMINMAXINFO)
+            {
+                WmGetMinMaxInfo(hwnd, lParam);
+                handled = true;
+            }
+
             return IntPtr.Zero;
+        }
+
+        private static void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
+        {
+            var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+
+            IntPtr monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+            if (monitor != IntPtr.Zero)
+            {
+                var monitorInfo = new MONITORINFO();
+                monitorInfo.cbSize = Marshal.SizeOf<MONITORINFO>();
+
+                if (GetMonitorInfo(monitor, ref monitorInfo))
+                {
+                    RECT workArea = monitorInfo.rcWork;
+                    RECT monitorArea = monitorInfo.rcMonitor;
+
+                    mmi.ptMaxPosition.X = Math.Abs(workArea.Left - monitorArea.Left);
+                    mmi.ptMaxPosition.Y = Math.Abs(workArea.Top - monitorArea.Top);
+                    mmi.ptMaxSize.X = Math.Abs(workArea.Right - workArea.Left);
+                    mmi.ptMaxSize.Y = Math.Abs(workArea.Bottom - workArea.Top);
+                }
+            }
+
+            Marshal.StructureToPtr(mmi, lParam, true);
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e)
