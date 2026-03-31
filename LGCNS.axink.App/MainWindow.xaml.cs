@@ -251,5 +251,14 @@ namespace LGCNS.axink.App
             return IntPtr.Zero;
         }
 
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void Config_Click(object sender, RoutedEventArgs e)
+        {
+            App.ShowWebViewSourceSettingsDialog(this);
+        }
     }
 }

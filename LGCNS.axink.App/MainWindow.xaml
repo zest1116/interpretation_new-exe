@@ -40,6 +40,7 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="34"/>
+                    <RowDefinition Height="32"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -150,9 +151,21 @@
                     </Grid>
                 </Border>
 
+                <!-- Menu Bar -->
+                <Border Grid.Row="1" Background="{StaticResource MenuBarBrush}"
+                    Padding="4,0,0,0">
+                    <Menu Style="{StaticResource MenuBarStyle}" VerticalAlignment="Center">
+                        <MenuItem Header="_파일" Style="{StaticResource MenuItemTopLevelStyle}">
+                            <MenuItem Header="환경설정" Style="{StaticResource SubMenuItemStyle}" Click="Config_Click"/>
+                            <Separator/>
+                            <MenuItem Header="종료" Style="{StaticResource SubMenuItemStyle}" Click="Exit_Click"/>
+                        </MenuItem>
+                    </Menu>
+                </Border>
+
                 <!-- Content -->
                 <Border x:Name="ContentBorder"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         Background="{StaticResource ContentBackgroundBrush}"
                         CornerRadius="0,0,10,10"
                         ClipToBounds="True">

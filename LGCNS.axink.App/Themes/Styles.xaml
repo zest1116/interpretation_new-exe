@@ -36,9 +36,8 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CloseButtonStyle"
-TargetType="Button"
-BasedOn="{StaticResource CaptionButtonStyle}">
+    <Style x:Key="CloseButtonStyle" TargetType="Button" 
+           BasedOn="{StaticResource CaptionButtonStyle}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -61,6 +60,124 @@ BasedOn="{StaticResource CaptionButtonStyle}">
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter Property="Opacity" Value="0.9"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MenuBarStyle" TargetType="Menu">
+        <Setter Property="Background" Value="{StaticResource MenuBarBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TitleForegroundBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="6,0,0,0"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+    </Style>
+
+    <Style x:Key="MenuItemTopLevelStyle" TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{StaticResource TitleForegroundBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+
+                    <!-- ⭐ 핵심: 전체 영역 확보 -->
+                    <Border x:Name="Root"
+                        Background="Transparent"
+                        Height="28"
+                        VerticalAlignment="Stretch">
+
+                        <!-- ⭐ 핵심: 내부 여백 컨테이너 -->
+                        <Border x:Name="HoverArea"
+                            Margin="2,2,2,2"
+                            Padding="10,4"
+                            CornerRadius="4"
+                            Background="{TemplateBinding Background}">
+
+                            <Grid>
+                                <ContentPresenter
+                                ContentSource="Header"
+                                RecognizesAccessKey="True"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+
+                                <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   PopupAnimation="Fade">
+
+                                    <Border Background="White"
+                                        BorderBrush="{StaticResource MenuPopupBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="4"
+                                        Margin="0,4,0,0">
+
+                                        <StackPanel IsItemsHost="True"/>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+
+                        <!-- Hover -->
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="HoverArea"
+                                Property="Background"
+                                Value="{StaticResource MenuHoverBrush}"/>
+                        </Trigger>
+
+                        <!-- Click / Open -->
+                        <Trigger Property="IsSubmenuOpen" Value="True">
+                            <Setter TargetName="HoverArea"
+                                Property="Background"
+                                Value="{StaticResource MenuPressedBrush}"/>
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SubMenuItemStyle" TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{StaticResource TitleForegroundBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="10,6,24,6"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="MinWidth" Value="130"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="SubRoot"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="4">
+                        <Grid>
+                            <ContentPresenter ContentSource="Header"
+                                          RecognizesAccessKey="True"
+                                          VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="SubRoot" Property="Background" Value="{StaticResource MenuHoverBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
