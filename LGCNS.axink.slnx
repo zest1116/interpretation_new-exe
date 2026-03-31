@@ -1,4 +1,10 @@
 <Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
   <Folder Name="/Application/">
     <Project Path="Application/LGCNS.axink.App.Services/LGCNS.axink.App.Services.csproj" Id="d706316a-dc0f-4f4f-a04b-fd7630194db0" />
     <Project Path="Application/LGCNS.axink.App/LGCNS.axink.App.csproj" />
@@ -6,5 +12,13 @@
     <Project Path="Application/LGCNS.axink.Common/LGCNS.axink.Common.csproj" Id="35a1b009-1c90-4701-b384-bb8467fe4442" />
     <Project Path="Application/LGCNS.axink.Models/LGCNS.axink.Models.csproj" Id="e55eda74-69a0-4ece-84d4-a69560c88f99" />
     <Project Path="Application/LGCNS.axink.WebHosting/LGCNS.axink.WebHosting.csproj" Id="65e0a712-ec4f-4903-9354-0248ba66ea36" />
+  </Folder>
+  <Folder Name="/Script/">
+    <File Path="Scripts/build.ps1" />
+  </Folder>
+  <Folder Name="/Setup/">
+    <Project Path="Setup/LGCNS.axink.MSI/LGCNS.axink.MSI.wixproj" Type="b7dd6f7e-def8-4e67-b5b7-07ef123db6f0" Id="ff441315-d4dd-4627-b597-fa0046ba46ef">
+      <Platform Solution="*|Any CPU" Project="x64" />
+    </Project>
   </Folder>
 </Solution>

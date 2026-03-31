@@ -1,0 +1,77 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+	 xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+	<!-- ★ UpgradeCode는 절대 변경하지 않음! 한번 생성 후 고정 ★ -->
+	<?define UpgradeCode = "C2098732-0E0A-4099-B14A-EA62A0AE55A3" ?>
+	<?define Manufacturer = "LGCNS" ?>
+	<?define ProductName = "axink" ?>
+	<?define ExeName = "axink.exe" ?>
+
+	<Package Id="LGCNS.axink.Installer"
+			 Name="$(ProductName)"
+			 Manufacturer="$(Manufacturer)"
+			 Version="!(bind.fileVersion.MainExeFile)"
+			 UpgradeCode="$(UpgradeCode)"
+			 Compressed="yes"
+			 InstallerVersion="500"
+			 Scope="perUser"
+			 Language="1042"
+			 Codepage="949">
+
+		<!-- 요약 정보 -->
+		<SummaryInformation
+			Description="$(ProductName) 설치 프로그램"
+            Manufacturer="$(Manufacturer)" />
+
+		<!-- ★ 업그레이드 핵심 설정 ★ -->
+		<MajorUpgrade
+			Schedule="afterInstallInitialize"
+			DowngradeErrorMessage="최신 버전이 이미 설치되어 있습니다."
+			AllowSameVersionUpgrades="yes" />
+
+		<!-- 단일 MSI 파일로 압축 -->
+		<MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+		<!-- 설치 UI -->
+		<UI>
+			<ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+			<Publish Dialog="ExitDialog"
+             Control="Finish"
+             Event="DoAction"
+             Value="LaunchApplication"
+             Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
+		</UI>
+
+		<!-- UI 리소스 -->
+		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+		<!-- 제어판 아이콘 -->
+		<Icon Id="ProductIcon" SourceFile="$(PublishDir)\$(ExeName)" />
+		<Property Id="ARPPRODUCTICON" Value="ProductIcon" />
+		<Property Id="ARPHELPLINK" Value="https://www.lgcns.com/" />
+		<Property Id="ARPURLINFOABOUT" Value="https://www.lgcns.com/" />
+
+		<!-- 설치 후 앱 실행 옵션 -->
+		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(ProductName) 실행" />
+		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+
+		<!-- 실행 대상 지정 -->
+		<Property Id="WixShellExecTarget" Value="[INSTALLFOLDER]$(ExeName)" />
+
+		<!-- CustomAction 정의 -->
+		<CustomAction Id="LaunchApplication"
+					  DllEntry="WixShellExec"
+					  Impersonate="yes"
+					  BinaryRef="Wix4UtilCA_X64" />
+
+		<Feature Id="MainFeature"
+				 Title="$(ProductName)"
+                 Level="1"
+                 ConfigurableDirectory="INSTALLFOLDER">
+			<!--<ComponentGroupRef Id="MainExeComponents" />-->
+			<ComponentGroupRef Id="RegistryComponents" />
+			<ComponentGroupRef Id="ShortcutComponents" />
+			<ComponentGroupRef Id="PublishedComponents" />
+		</Feature>
+	</Package>
+</Wix>

@@ -1,0 +1,41 @@
+﻿<Project Sdk="WixToolset.Sdk/6.0.2">
+	<PropertyGroup>
+		<OutputType>Package</OutputType>
+		<InstallerPlatform>x64</InstallerPlatform>
+		<OutputName>LGCNS-axink-$(Version)</OutputName>
+		<DefaultLanguage>ko-KR</DefaultLanguage>
+		<SuppressIces>ICE38;ICE64</SuppressIces>
+	</PropertyGroup>
+	<PropertyGroup>
+		<SolutionDir Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)..\..\</SolutionDir>
+		<PublishDir Condition="'$(PublishDir)' == ''">$([System.IO.Path]::GetFullPath('$(SolutionDir)Publish\'))</PublishDir>
+		<DefineConstants>$(DefineConstants);PublishDir=$(PublishDir)</DefineConstants>
+		<LinkerBindInputPaths>$(PublishDir)</LinkerBindInputPaths>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+	<PropertyGroup>
+		<SuppressIces>ICE38;ICE64</SuppressIces>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+		<PackageReference Include="WixToolset.Util.wixext" Version="6.0.2" />
+		<PackageReference Include="WixToolset.Heat" Version="6.0.2" />
+	</ItemGroup>
+	<ItemGroup>
+		<HarvestDirectory Include="$(PublishDir)">
+			<ComponentGroupName>PublishedComponents</ComponentGroupName>
+			<DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
+			<SuppressRootDirectory>true</SuppressRootDirectory>
+			<AutogenerateGuids>true</AutogenerateGuids>
+			<SuppressRegistry>true</SuppressRegistry>
+			<PreprocessorVariable>var.PublishDir</PreprocessorVariable>
+			<Transforms>Transforms\SetExeFileId.xslt</Transforms>
+		</HarvestDirectory>
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="License.rtf" />
+		<None Include="Transforms\SetExeFileId.xslt" />
+	</ItemGroup>
+</Project>

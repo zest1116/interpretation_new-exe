@@ -1,0 +1,18 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Fragment>
+		<!-- 프로그램 설치 폴더 (64비트) -->
+		<StandardDirectory Id="LocalAppDataFolder">
+			<Directory Id="ManufacturerFolder" Name="!(bind.Property.Manufacturer)">
+				<Directory Id="INSTALLFOLDER" Name="!(bind.Property.ProductName)" />
+			</Directory>
+		</StandardDirectory>
+
+		<!-- 시작 메뉴 폴더 -->
+		<StandardDirectory Id="ProgramMenuFolder">
+			<Directory Id="ApplicationMenuFolder" Name="!(bind.Property.ProductName)" />
+		</StandardDirectory>
+
+		<!-- 바탕화면 -->
+		<StandardDirectory Id="DesktopFolder" />
+	</Fragment>
+</Wix>
