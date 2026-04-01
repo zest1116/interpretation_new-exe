@@ -10,9 +10,7 @@ using LGCNS.axink.Common.Monitors;
 using LGCNS.axink.Models.Devices;
 using LGCNS.axink.Models.Settings;
 using LGCNS.axink.WebHosting;
-using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
-using NAudio.MediaFoundation;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -155,9 +153,12 @@ namespace LGCNS.axink.App
             var deviceChangeHub = new DeviceChangeHub(deviceListener, deviceService, webCapture, bus);
             deviceChangeHub.Start(); //deviceListner.start()도 실행
 
+            // WebView2 ↔ SPA 양방향 통신 브릿지
+            var webViewBridge = new WebViewBridge(deviceService, webCapture);
+
             var messenger = _serviceProvider.GetRequiredService<IMessenger>();
 
-            var main = new MainWindow(systemSettingsMon, appSettingsMon, messenger, deviceChangeHub);
+            var main = new MainWindow(systemSettingsMon, appSettingsMon, messenger, deviceChangeHub, webViewBridge);
             MainWindow = main;
             main.Show();
 

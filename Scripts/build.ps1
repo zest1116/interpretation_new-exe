@@ -2,9 +2,7 @@
     [Parameter(Mandatory=$true)]
     [string]$Version,
     [switch]$PublishOnly,
-    [switch]$BuildMsi,
-    [switch]$BuildBundle,
-    [switch]$CreateRelease
+    [switch]$BuildMsi
 )
 
 $ErrorActionPreference = "Stop"
@@ -59,7 +57,7 @@ if ($PublishOnly) {
 }
 
 # 2. MSI 빌드
-if ($BuildMsi -or $BuildBundle -or $CreateRelease) {
+if ($BuildMsi) {
     Write-Host "`n[2/3] Building MSI..." -ForegroundColor Yellow
     
     dotnet build "$SolutionDir\Setup\LGCNS.axink.MSI\LGCNS.axink.MSI.wixproj" `

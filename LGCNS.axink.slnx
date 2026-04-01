@@ -13,6 +13,9 @@
     <Project Path="Application/LGCNS.axink.Models/LGCNS.axink.Models.csproj" Id="e55eda74-69a0-4ece-84d4-a69560c88f99" />
     <Project Path="Application/LGCNS.axink.WebHosting/LGCNS.axink.WebHosting.csproj" Id="65e0a712-ec4f-4903-9354-0248ba66ea36" />
   </Folder>
+  <Folder Name="/Doc/">
+    <File Path="Doc/통신API_V0.9.md" />
+  </Folder>
   <Folder Name="/Script/">
     <File Path="Scripts/build.ps1" />
   </Folder>

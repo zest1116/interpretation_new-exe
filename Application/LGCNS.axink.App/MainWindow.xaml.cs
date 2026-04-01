@@ -5,10 +5,8 @@ using LGCNS.axink.Common.Monitors;
 using LGCNS.axink.Models.Settings;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
-using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -78,12 +76,14 @@ namespace LGCNS.axink.App
         private readonly ISettingsMonitor<AppSettings> _appSettings;
         private readonly IMessenger _messenger;
         private readonly DeviceChangeHub _deviceChangeHub;
+        private readonly WebViewBridge _webViewBridge;
 
         public MainWindow(
             ISettingsMonitor<SystemSettings> sysSettings,
             ISettingsMonitor<AppSettings> appSettings,
             IMessenger messenger,
-            DeviceChangeHub hub)
+            DeviceChangeHub hub,
+            WebViewBridge webViewBridge)
         {
             InitializeComponent();
 
@@ -91,6 +91,7 @@ namespace LGCNS.axink.App
             _appSettings = appSettings;
             _messenger = messenger;
             _deviceChangeHub = hub;
+            _webViewBridge= webViewBridge;
             _deviceChangeHub.DeviceListChanged += DeviceChangeHub_DeviceListChanged;
 
             SourceInitialized += MainWindow_SourceInitialized;
@@ -101,6 +102,29 @@ namespace LGCNS.axink.App
             {
                 NavigateIfPossible(msg.Value.WebViewSource);
             });
+        }
+
+        private async void CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            try
+            {
+                var rawJson = e.WebMessageAsJson;
+
+                Logging.Debug($"[WebViewBridge] SPA → WPF 수신: {rawJson}");
+
+                var response = await _webViewBridge.HandleMessageAsync(rawJson);
+
+                // 응답이 있으면 SPA로 전달
+                if (response != null && WebView?.CoreWebView2 != null)
+                {
+                    Logging.Debug($"[WebViewBridge] WPF → SPA 응답: {response}");
+                    WebView.CoreWebView2.PostWebMessageAsJson(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logging.Error(ex, "[WebViewBridge] WebMessageReceived 처리 중 오류");
+            }
         }
 
         private void DeviceChangeHub_DeviceListChanged(object? sender, DeviceListChangedEventArgs e)
@@ -185,6 +209,7 @@ namespace LGCNS.axink.App
                 return;
 
             WebView.Source = uri;
+            WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
         }
 
         private void MainWindow_SourceInitialized(object? sender, EventArgs e)
