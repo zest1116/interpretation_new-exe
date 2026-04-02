@@ -66,9 +66,9 @@ namespace LGCNS.axink.WebHosting
             app.UseWebSockets();
 
             // HTTP
-            app.MapHealthEndpoints();
-            app.MapDevicesEndpoints();
-            app.MapAudioControlEndpoints();
+            //app.MapHealthEndpoints();
+            //app.MapDevicesEndpoints();
+            //app.MapAudioControlEndpoints();
 
             // WS
             app.MapAudioWebSocket();

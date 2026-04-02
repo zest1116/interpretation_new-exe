@@ -38,7 +38,7 @@ foreach ($path in $pathsToClean) {
 }
 
 # 1. Publish
-Write-Host "`n[1/3] Publishing app..." -ForegroundColor Yellow
+Write-Host "`n[1/2] Publishing app..." -ForegroundColor Yellow
 
 dotnet publish "$SolutionDir\Application\LGCNS.axink.App\LGCNS.axink.App.csproj" `
     -c Release `
@@ -58,7 +58,7 @@ if ($PublishOnly) {
 
 # 2. MSI 빌드
 if ($BuildMsi) {
-    Write-Host "`n[2/3] Building MSI..." -ForegroundColor Yellow
+    Write-Host "`n[2/2] Building MSI..." -ForegroundColor Yellow
     
     dotnet build "$SolutionDir\Setup\LGCNS.axink.MSI\LGCNS.axink.MSI.wixproj" `
         -c Release `

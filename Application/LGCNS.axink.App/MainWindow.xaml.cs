@@ -5,7 +5,9 @@ using LGCNS.axink.Common.Monitors;
 using LGCNS.axink.Models.Settings;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -96,6 +98,7 @@ namespace LGCNS.axink.App
 
             SourceInitialized += MainWindow_SourceInitialized;
             Loaded += MainWindow_Loaded;
+            Closing += MainWindow_Closing;
             StateChanged += MainWindow_StateChanged;
 
             _messenger.Register<SettingsChangedMessage<AppSettings>>(this, (_, msg) =>
@@ -103,6 +106,7 @@ namespace LGCNS.axink.App
                 NavigateIfPossible(msg.Value.WebViewSource);
             });
         }
+
 
         private async void CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
@@ -149,6 +153,16 @@ namespace LGCNS.axink.App
         {
             try
             {
+                // 저장된 위치/크기 복원
+                Left = _sysSettings.Current.WindowLeft;
+                Top = _sysSettings.Current.WindowTop;
+                Width = _sysSettings.Current.WindowWidth;
+                Height = _sysSettings.Current.WindowHeight;
+                WindowState = (WindowState)_sysSettings.Current.WindowState;
+
+                // 화면 밖으로 나가지 않도록 보정
+                EnsureWindowIsVisible();
+
                 await InitializeWebView2Async();
 
                 if (string.IsNullOrWhiteSpace(_appSettings.Current.WebViewSource))
@@ -162,11 +176,67 @@ namespace LGCNS.axink.App
                 }
 
                 UpdateVisualState();
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var settings = _sysSettings.Current;
+
+            // 최대화/최소화 상태면 복원 후 저장
+            if (WindowState == WindowState.Normal)
+            {
+                settings.WindowLeft = Left;
+                settings.WindowTop = Top;
+                settings.WindowWidth = Width;
+                settings.WindowHeight = Height;
+            }
+            else
+            {
+                settings.WindowLeft = RestoreBounds.Left;
+                settings.WindowTop = RestoreBounds.Top;
+                settings.WindowWidth = RestoreBounds.Width;
+                settings.WindowHeight = RestoreBounds.Height;
+            }
+
+            settings.WindowState = (int)WindowState;
+            _sysSettings.UpdateAndSave(settings);
+        }
+
+        private void EnsureWindowIsVisible()
+        {
+            // 모든 모니터 영역 확인
+            var virtualScreen = new Rect(
+                SystemParameters.VirtualScreenLeft,
+                SystemParameters.VirtualScreenTop,
+                SystemParameters.VirtualScreenWidth,
+                SystemParameters.VirtualScreenHeight);
+
+            // 창이 화면 밖에 있으면 기본 위치로
+            if (Left < virtualScreen.Left - Width + 50 ||
+                Left > virtualScreen.Right - 50 ||
+                Top < virtualScreen.Top ||
+                Top > virtualScreen.Bottom - 50)
+            {
+                Left = 100;
+                Top = 100;
+            }
+
+            // 최소 크기 보장
+            if (Width < 200) Width = 700;
+            if (Height < 100) Height = 800;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            if (_deviceChangeHub != null)
+                _deviceChangeHub.DeviceListChanged -= DeviceChangeHub_DeviceListChanged;
+            base.OnClosed(e);
         }
 
         private async Task InitializeWebView2Async()

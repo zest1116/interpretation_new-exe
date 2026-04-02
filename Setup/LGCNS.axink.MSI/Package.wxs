@@ -5,6 +5,7 @@
 	<?define UpgradeCode = "C2098732-0E0A-4099-B14A-EA62A0AE55A3" ?>
 	<?define Manufacturer = "LGCNS" ?>
 	<?define ProductName = "axink" ?>
+	<?define DisplayName = "a:xink" ?>
 	<?define ExeName = "axink.exe" ?>
 
 	<Package Id="LGCNS.axink.Installer"
@@ -20,7 +21,7 @@
 
 		<!-- 요약 정보 -->
 		<SummaryInformation
-			Description="$(ProductName) 설치 프로그램"
+			Description="$(DisplayName) 설치 프로그램"
             Manufacturer="$(Manufacturer)" />
 
 		<!-- ★ 업그레이드 핵심 설정 ★ -->
@@ -52,7 +53,7 @@
 		<Property Id="ARPURLINFOABOUT" Value="https://www.lgcns.com/" />
 
 		<!-- 설치 후 앱 실행 옵션 -->
-		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(ProductName) 실행" />
+		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(DisplayName) 실행" />
 		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
 
 		<!-- 실행 대상 지정 -->
@@ -65,7 +66,7 @@
 					  BinaryRef="Wix4UtilCA_X64" />
 
 		<Feature Id="MainFeature"
-				 Title="$(ProductName)"
+				 Title="$(DisplayName)"
                  Level="1"
                  ConfigurableDirectory="INSTALLFOLDER">
 			<!--<ComponentGroupRef Id="MainExeComponents" />-->

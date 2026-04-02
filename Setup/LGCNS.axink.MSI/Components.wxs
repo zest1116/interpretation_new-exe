@@ -3,13 +3,24 @@
 	<Fragment>
 		<?define PublishDir = "$(var.SolutionDir)Publish\" ?>
 		<?define ExeName = "axink.exe" ?>
+		<?define FolderName = "axink" ?>
+		<?define DisplayName = "a:xink" ?>
+
 		<!-- 레지스트리 정보 (앱에서 설치 경로 조회용) -->
 		<ComponentGroup Id="RegistryComponents" Directory="INSTALLFOLDER">
 			<Component Id="RegistryEntries" Guid="*">
-				<RegistryKey Root="HKCU" Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)">
+				<RegistryKey Root="HKCU" Key="Software\LGCNS\$(FolderName)">
 					<RegistryValue Name="InstallPath" Type="string" Value="[INSTALLFOLDER]" KeyPath="yes" />
 					<RegistryValue Name="Version" Type="string" Value="!(bind.fileVersion.MainExeFile)" />
 				</RegistryKey>
+
+				<!-- 제어판 "프로그램 및 기능"에 a:xink 로 표시 (MSI 기본값 덮어쓰기) -->
+				<RegistryValue Root="HKCU"
+							   Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductCode]"
+							   Name="DisplayName"
+							   Type="string"
+							   Value="$(DisplayName)" />
+
 				<RemoveFolder Id="RemoveInstallFolder" Directory="INSTALLFOLDER" On="uninstall" />
 				<RemoveFolder Id="RemoveManufacturerFolder" Directory="ManufacturerFolder" On="uninstall" />
 			</Component>
@@ -20,22 +31,22 @@
 			<!-- 시작 메뉴 바로가기 -->
 			<Component Id="StartMenuShortcut" Directory="ApplicationMenuFolder" Guid="*">
 				<Shortcut Id="StartMenuShortcutLink"
-                          Name="!(bind.Property.ProductName)"
-                          Description="!(bind.Property.ProductName) 실행"
+                          Name="$(FolderName)"
+                          Description="$(DisplayName) 실행"
                           Target="[INSTALLFOLDER]$(ExeName)"
                           WorkingDirectory="INSTALLFOLDER"
                           Icon="ProductIcon" />
 
 				<Shortcut Id="UninstallShortcut"
-                          Name="!(bind.Property.ProductName) 제거"
-                          Description="!(bind.Property.ProductName) 제거"
+                          Name="$(FolderName) 제거"
+                          Description="$(DisplayName) 제거"
                           Target="[SystemFolder]msiexec.exe"
                           Arguments="/x [ProductCode]" />
 
 				<RemoveFolder Id="RemoveApplicationMenuFolder" On="uninstall" />
 
 				<RegistryValue Root="HKCU"
-                               Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
+                               Key="Software\LGCNS\$(FolderName)"
                                Name="StartMenuShortcut"
                                Type="integer"
                                Value="1"
@@ -45,14 +56,14 @@
 			<!-- 바탕화면 바로가기 -->
 			<Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="*">
 				<Shortcut Id="DesktopShortcutLink"
-                          Name="!(bind.Property.ProductName)"
-                          Description="!(bind.Property.ProductName) 실행"
+                          Name="$(FolderName)"
+                          Description="$(DisplayName) 실행"
                           Target="[INSTALLFOLDER]$(ExeName)"
                           WorkingDirectory="INSTALLFOLDER"
                           Icon="ProductIcon" />
 
 				<RegistryValue Root="HKCU"
-                               Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
+                               Key="Software\LGCNS\$(FolderName)"
                                Name="DesktopShortcut"
                                Type="integer"
                                Value="1"
