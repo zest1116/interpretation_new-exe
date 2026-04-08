@@ -1,10 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using LGCNS.axink.App.Services;
+using LGCNS.axink.App.Windows;
 using LGCNS.axink.Common;
 using LGCNS.axink.Common.Monitors;
+using LGCNS.axink.Models.Devices;
 using LGCNS.axink.Models.Settings;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -74,26 +77,32 @@ namespace LGCNS.axink.App
 
         #endregion
 
+        private readonly ISettingsMonitor<UserSettings> _userSettings;
         private readonly ISettingsMonitor<SystemSettings> _sysSettings;
         private readonly ISettingsMonitor<AppSettings> _appSettings;
         private readonly IMessenger _messenger;
+        private readonly IDeviceService _deviceService;
         private readonly DeviceChangeHub _deviceChangeHub;
         private readonly WebViewBridge _webViewBridge;
 
         public MainWindow(
+            ISettingsMonitor<UserSettings> userSettings,
             ISettingsMonitor<SystemSettings> sysSettings,
             ISettingsMonitor<AppSettings> appSettings,
             IMessenger messenger,
+            IDeviceService deviceService,
             DeviceChangeHub hub,
             WebViewBridge webViewBridge)
         {
             InitializeComponent();
 
+            _userSettings = userSettings;
             _sysSettings = sysSettings;
             _appSettings = appSettings;
             _messenger = messenger;
+            _deviceService = deviceService;
             _deviceChangeHub = hub;
-            _webViewBridge= webViewBridge;
+            _webViewBridge = webViewBridge;
             _deviceChangeHub.DeviceListChanged += DeviceChangeHub_DeviceListChanged;
 
             SourceInitialized += MainWindow_SourceInitialized;
@@ -101,7 +110,7 @@ namespace LGCNS.axink.App
             Closing += MainWindow_Closing;
             StateChanged += MainWindow_StateChanged;
 
-            _messenger.Register<SettingsChangedMessage<AppSettings>>(this, (_, msg) =>
+            _messenger.Register<SettingsChangedMessage<UserSettings>>(this, (_, msg) =>
             {
                 NavigateIfPossible(msg.Value.WebViewSource);
             });
@@ -116,13 +125,25 @@ namespace LGCNS.axink.App
 
                 Logging.Debug($"[WebViewBridge] SPA → WPF 수신: {rawJson}");
 
-                var response = await _webViewBridge.HandleMessageAsync(rawJson);
+                var msg = JObject.Parse(rawJson);
+                var type = msg.Value<string>("type");
 
-                // 응답이 있으면 SPA로 전달
-                if (response != null && WebView?.CoreWebView2 != null)
+                if (type == "showDeviceWindow")
                 {
-                    Logging.Debug($"[WebViewBridge] WPF → SPA 응답: {response}");
-                    WebView.CoreWebView2.PostWebMessageAsJson(response);
+                    var win = new Windows.DeviceControllerWindow(_deviceService, _deviceChangeHub, this);
+                    win.ShowDialog();
+                }
+                else
+                {
+
+                    var response = await _webViewBridge.HandleMessageAsync(rawJson);
+
+                    // 응답이 있으면 SPA로 전달
+                    if (response != null && WebView?.CoreWebView2 != null)
+                    {
+                        Logging.Debug($"[WebViewBridge] WPF → SPA 응답: {response}");
+                        WebView.CoreWebView2.PostWebMessageAsJson(response);
+                    }
                 }
             }
             catch (Exception ex)
@@ -165,7 +186,7 @@ namespace LGCNS.axink.App
 
                 await InitializeWebView2Async();
 
-                if (string.IsNullOrWhiteSpace(_appSettings.Current.WebViewSource))
+                if (string.IsNullOrWhiteSpace(_userSettings.Current.WebViewSource))
                 {
                     var ok = App.ShowWebViewSourceSettingsDialog(this);
                     if (ok != true)
@@ -236,6 +257,7 @@ namespace LGCNS.axink.App
         {
             if (_deviceChangeHub != null)
                 _deviceChangeHub.DeviceListChanged -= DeviceChangeHub_DeviceListChanged;
+            Application.Current.Shutdown();
             base.OnClosed(e);
         }
 
@@ -256,7 +278,7 @@ namespace LGCNS.axink.App
                 var env = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
                 await WebView.EnsureCoreWebView2Async(env);
 
-                NavigateIfPossible(_appSettings.Current.WebViewSource);
+                NavigateIfPossible(_userSettings.Current.WebViewSource);
             }
             catch (Exception ex)
             {
@@ -425,6 +447,25 @@ namespace LGCNS.axink.App
         private void Config_Click(object sender, RoutedEventArgs e)
         {
             App.ShowWebViewSourceSettingsDialog(this);
+        }
+
+        private void AuditoDevice_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new Windows.DeviceControllerWindow(_deviceService, _deviceChangeHub, this);
+            win.ShowDialog();
+        }
+
+        private void CompanySelect_Click(object sender, RoutedEventArgs e)
+        {
+            var selector = new CompanySelectWindow(_appSettings.Current.TenantListUrl, _appSettings.Current.CompanyCode);
+            if (selector.ShowDialog() == true)
+            {
+                if (_appSettings.Current.CompanyCode != selector.SelectedCompanyCode)
+                {
+                    RegistryUtils.SaveCompanyCode(selector.SelectedCompanyCode);
+                    Application.Current.Shutdown();
+                }
+            }
         }
     }
 }

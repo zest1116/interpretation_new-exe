@@ -4,9 +4,9 @@ using System.Windows.Input;
 
 namespace LGCNS.axink.App.Windows
 {
-    public partial class AppSettingsWindow : Window
+    public partial class UserSettingsWindow : Window
     {
-        public AppSettingsWindow(AppSettingsViewModel vm)
+        public UserSettingsWindow(UserSettingsViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;

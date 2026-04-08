@@ -16,7 +16,7 @@ namespace LGCNS.axink.Common
         /// <summary>
         /// 제품명
         /// </summary>
-        public const string APP_NAME = "axink";
+        public const string APP_NAME = "axink Translator";
 
         /// <summary>
         /// 녹음파일 Root폴더명
@@ -24,7 +24,12 @@ namespace LGCNS.axink.Common
         public const string DIR_NAME_WAVE_ROOT = "Recording";
 
         /// <summary>
-        /// AppSettings.json 파일명
+        /// UserSettings.json 파일명
+        /// </summary>
+        public const string FILE_NAME_USER_SETTINGS = "UserSettings.json";
+
+        /// <summary>
+        /// AppSettings.json
         /// </summary>
         public const string FILE_NAME_APP_SETTINGS = "AppSettings.json";
 

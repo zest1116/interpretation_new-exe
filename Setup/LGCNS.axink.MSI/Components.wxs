@@ -2,9 +2,9 @@
 	 xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 	<Fragment>
 		<?define PublishDir = "$(var.SolutionDir)Publish\" ?>
-		<?define ExeName = "axink.exe" ?>
-		<?define FolderName = "axink" ?>
-		<?define DisplayName = "a:xink" ?>
+		<?define ExeName = "axink Translator.exe" ?>
+		<?define FolderName = "axink Translator" ?>
+		<?define DisplayName = "a:xink Translator" ?>
 
 		<!-- 레지스트리 정보 (앱에서 설치 경로 조회용) -->
 		<ComponentGroup Id="RegistryComponents" Directory="INSTALLFOLDER">
@@ -23,6 +23,22 @@
 
 				<RemoveFolder Id="RemoveInstallFolder" Directory="INSTALLFOLDER" On="uninstall" />
 				<RemoveFolder Id="RemoveManufacturerFolder" Directory="ManufacturerFolder" On="uninstall" />
+			</Component>
+			<!-- ✅ 환경변수 추가 -->
+			<Component Id="Comp_EnvVariable" Guid="*">
+				<Environment Id="Env_AxinkEnvironment"
+							 Name="AXINK_ENVIRONMENT"
+							 Value="$(var.AppEnvironment)"
+							 Permanent="no"
+							 Part="all"
+							 Action="set"
+							 System="no" />
+				<RegistryValue Root="HKCU"
+							   Key="Software\LGCNS\$(FolderName)"
+							   Name="EnvVariable"
+							   Type="integer"
+							   Value="1"
+							   KeyPath="yes" />
 			</Component>
 		</ComponentGroup>
 

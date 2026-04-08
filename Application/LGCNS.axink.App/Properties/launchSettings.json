@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "Development": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AXINK_ENVIRONMENT": "Development"
+      }
+    },
+    "QA": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AXINK_ENVIRONMENT": "QA"
+      }
+    },
+    "Production": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AXINK_ENVIRONMENT": "Production"
+      }
+    }
+  }
+}

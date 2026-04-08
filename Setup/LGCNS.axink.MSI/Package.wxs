@@ -4,9 +4,9 @@
 	<!-- ★ UpgradeCode는 절대 변경하지 않음! 한번 생성 후 고정 ★ -->
 	<?define UpgradeCode = "C2098732-0E0A-4099-B14A-EA62A0AE55A3" ?>
 	<?define Manufacturer = "LGCNS" ?>
-	<?define ProductName = "axink" ?>
-	<?define DisplayName = "a:xink" ?>
-	<?define ExeName = "axink.exe" ?>
+	<?define ProductName = "axink Translator" ?>
+	<?define DisplayName = "a:xink Translator" ?>
+	<?define ExeName = "axink Translator.exe" ?>
 
 	<Package Id="LGCNS.axink.Installer"
 			 Name="$(ProductName)"
@@ -45,13 +45,15 @@
 
 		<!-- UI 리소스 -->
 		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+		<WixVariable Id="WixUIDialogBmp" Value="WixUIDialogBmp.bmp" />
+		<WixVariable Id="WixUIBannerBmp" Value="WixUIBannerBmp.bmp" />
 
 		<!-- 제어판 아이콘 -->
-		<Icon Id="ProductIcon" SourceFile="$(PublishDir)\$(ExeName)" />
+		<Icon Id="ProductIcon" SourceFile="ProductIcon.ico" />
 		<Property Id="ARPPRODUCTICON" Value="ProductIcon" />
 		<Property Id="ARPHELPLINK" Value="https://www.lgcns.com/" />
 		<Property Id="ARPURLINFOABOUT" Value="https://www.lgcns.com/" />
-
+				
 		<!-- 설치 후 앱 실행 옵션 -->
 		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(DisplayName) 실행" />
 		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
@@ -69,7 +71,6 @@
 				 Title="$(DisplayName)"
                  Level="1"
                  ConfigurableDirectory="INSTALLFOLDER">
-			<!--<ComponentGroupRef Id="MainExeComponents" />-->
 			<ComponentGroupRef Id="RegistryComponents" />
 			<ComponentGroupRef Id="ShortcutComponents" />
 			<ComponentGroupRef Id="PublishedComponents" />

@@ -159,10 +159,12 @@
                         Padding="4,0,0,0">
                     <Menu Style="{StaticResource MenuBarStyle}"
                           VerticalAlignment="Center">
-                        <MenuItem Header="_파일" Style="{StaticResource MenuItemTopLevelStyle}">
-                            <MenuItem Header="환경설정" Style="{StaticResource SubMenuItemStyle}" Click="Config_Click"/>
+                        <MenuItem Header="{DynamicResource Dic_Menu_File}" Style="{StaticResource MenuItemTopLevelStyle}">
+                            <MenuItem Header="{DynamicResource Dic_Menu_Config}" Style="{StaticResource SubMenuItemStyle}" Click="Config_Click"/>
+                            <MenuItem Header="{DynamicResource Dic_Menu_Audio}" Style="{StaticResource SubMenuItemStyle}" Click="AuditoDevice_Click"/>
+                            <MenuItem Header="{DynamicResource Dic_CompanySelect}" Style="{StaticResource SubMenuItemStyle}" Click="CompanySelect_Click"/>
                             <Separator Style="{StaticResource SubMenuSeparatorStyle}"/>
-                            <MenuItem Header="종료" Style="{StaticResource SubMenuItemStyle}" Click="Exit_Click"/>
+                            <MenuItem Header="{DynamicResource Dic_Menu_Close}" Style="{StaticResource SubMenuItemStyle}" Click="Exit_Click"/>
                         </MenuItem>
                     </Menu>
                 </Border>

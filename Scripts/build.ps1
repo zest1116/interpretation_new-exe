@@ -1,6 +1,8 @@
 ﻿param(
     [Parameter(Mandatory=$true)]
     [string]$Version,
+    [ValidateSet("Development","QA","Production")]
+    [string]$Environment = "Production",
     [switch]$PublishOnly,
     [switch]$BuildMsi
 )
@@ -38,7 +40,7 @@ foreach ($path in $pathsToClean) {
 }
 
 # 1. Publish
-Write-Host "`n[1/2] Publishing app..." -ForegroundColor Yellow
+Write-Host "`n[1/3] Publishing app..." -ForegroundColor Yellow
 
 dotnet publish "$SolutionDir\Application\LGCNS.axink.App\LGCNS.axink.App.csproj" `
     -c Release `
@@ -56,15 +58,47 @@ if ($PublishOnly) {
     exit 0
 }
 
+# 2. appsettings.json 환경별 병합
+Write-Host "`n[2/3] 환경 설정 병합: $Environment" -ForegroundColor Yellow
+
+$baseConfig = Join-Path $PublishDir "appsettings.json"
+$envConfig  = Join-Path $PublishDir "appsettings.$Environment.json"
+
+if (Test-Path $envConfig) {
+    $base = Get-Content $baseConfig -Raw | ConvertFrom-Json
+    $env  = Get-Content $envConfig  -Raw | ConvertFrom-Json
+
+    foreach ($prop in $env.AppSettings.PSObject.Properties) {
+        if ($prop.Value) {
+            $base.AppSettings | Add-Member -Force -MemberType NoteProperty -Name $prop.Name -Value $prop.Value
+        }
+    }
+
+    $base | ConvertTo-Json -Depth 10 | Set-Content $baseConfig -Encoding UTF8
+    Write-Host "  병합 완료: $baseConfig" -ForegroundColor Green
+} else {
+    Write-Host "  환경별 파일 없음, 기본값 사용" -ForegroundColor Gray
+}
+
+# 환경별 파일 제거 (배포에 불필요)
+Remove-Item "$PublishDir\appsettings.*.json" -Force -ErrorAction SilentlyContinue
+Write-Host "  환경별 파일 정리 완료" -ForegroundColor Green
+
+if ($PublishOnly) {
+    Write-Host "`nPublish 완료: $PublishDir" -ForegroundColor Green
+    exit 0
+}
+
 # 2. MSI 빌드
 if ($BuildMsi) {
-    Write-Host "`n[2/2] Building MSI..." -ForegroundColor Yellow
+    Write-Host "`n[3/3] Building MSI..." -ForegroundColor Yellow
     
     dotnet build "$SolutionDir\Setup\LGCNS.axink.MSI\LGCNS.axink.MSI.wixproj" `
         -c Release `
         -p:Platform=x64 `
         -p:Version=$Version4 `
-        -p:PublishDir="$PublishDir"
+        -p:PublishDir="$PublishDir" `
+        -p:AppEnvironment=$Environment
     
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }

@@ -5,9 +5,9 @@ using LGCNS.axink.Models.Settings;
 
 namespace LGCNS.axink.App.ViewModels
 {
-    public sealed partial class AppSettingsViewModel : ObservableObject
+    public sealed partial class UserSettingsViewModel : ObservableObject
     {
-        private readonly ISettingsMonitor<AppSettings> _appSettings;
+        private readonly ISettingsMonitor<UserSettings> _userSettings;
 
         [ObservableProperty]
         private string webViewSource = "";
@@ -19,10 +19,10 @@ namespace LGCNS.axink.App.ViewModels
 
         public event Action<bool?>? RequestClose;
 
-        public AppSettingsViewModel(ISettingsMonitor<AppSettings> appSettings)
+        public UserSettingsViewModel(ISettingsMonitor<UserSettings> userSettings)
         {
-            _appSettings = appSettings;
-            webViewSource = _appSettings.Current.WebViewSource ?? "";
+            _userSettings = userSettings;
+            webViewSource = _userSettings.Current.WebViewSource ?? "";
         }
 
 
@@ -76,8 +76,8 @@ namespace LGCNS.axink.App.ViewModels
 
             ValidationMessage = "";
 
-            var newSettings = new AppSettings { WebViewSource = input };
-            _appSettings.UpdateAndSave(newSettings);
+            var newSettings = new UserSettings { WebViewSource = input };
+            _userSettings.UpdateAndSave(newSettings);
 
             RequestClose?.Invoke(true);
         }

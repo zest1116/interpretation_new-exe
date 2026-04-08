@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.ComponentModel.__Internals;
+using CommunityToolkit.Mvvm.Messaging;
 using LGCNS.axink.App.Services;
 using LGCNS.axink.App.ViewModels;
 using LGCNS.axink.App.Windows;
@@ -10,8 +11,11 @@ using LGCNS.axink.Common.Monitors;
 using LGCNS.axink.Models.Devices;
 using LGCNS.axink.Models.Settings;
 using LGCNS.axink.WebHosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -31,14 +35,19 @@ namespace LGCNS.axink.App
 
         //서비스
         public static ServiceProvider _serviceProvider { get; private set; } = default!;
-        
+
         //Web Hosting
         private LocalServerHost? _server;
+
+        /// <summary>
+        /// 회사코드
+        /// </summary>
+        public static string? CompanyCode { get; private set; }
 
         #region WIN32 메시지
 
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool PostMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam); 
+        private static extern bool PostMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         #endregion
 
@@ -56,31 +65,64 @@ namespace LGCNS.axink.App
 
             base.OnStartup(e);
 
+            //언어설정
+
+            string lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+            // 지원 언어가 아니면 기본값
+            var supported = new[] { "ko", "en", "zh" };
+            if (!supported.Contains(lang)) lang = "en";
+
+            var dict = new ResourceDictionary
+            {
+                Source = new Uri($"Resources/Strings.{lang}.xaml", UriKind.Relative)
+            };
+            Resources.MergedDictionaries.Add(dict);
+
+            //회사코드
+            CompanyCode = RegistryUtils.ReadCompanyCode();
+
+            // 1. 환경별 기본값 로드 (appsettings.json)
+            var defaultAppSettings = AppConfigLoader.LoadSection<AppSettings>("AppSettings");
+
+            if (!string.IsNullOrEmpty(CompanyCode))
+            {
+                defaultAppSettings.CompanyCode = CompanyCode;
+            }
+
             //로깅 초기화
             Logging.Init(Consts.APP_NAME, Consts.APP_COMPANY);
 
             //앱 시작
             Logging.Info($"앱 시작 - Version: {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
+            Logging.Info($"환경: {Environment.GetEnvironmentVariable("AXINK_ENVIRONMENT") ?? "Production"}");
 
             var sc = new ServiceCollection();
 
             sc.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
             sc.AddSingleton<IEventBus, ChannelEventBus>();
 
-            //Device change notification
+            // Device change notification
             sc.AddSingleton<DeviceNotificationListener>();
 
-            // Stores
-            sc.AddSingleton(sp => new JsonFileStore<AppSettings>(Consts.APP_NAME, Consts.FILE_NAME_APP_SETTINGS));
+            // 2. JsonFileStore — 로컬 파일 없으면 기본값으로 시드
+            sc.AddSingleton(sp =>
+            {
+                var store = new JsonFileStore<AppSettings>(Consts.APP_NAME, Consts.FILE_NAME_APP_SETTINGS);
+                store.LoadOrCreate(defaultAppSettings);  // 최초 1회만 파일 생성
+                return store;
+            }); 
+            sc.AddSingleton(sp => new JsonFileStore<UserSettings>(Consts.APP_NAME, Consts.FILE_NAME_USER_SETTINGS));
             sc.AddSingleton(sp => new JsonFileStore<SystemSettings>(Consts.APP_NAME, Consts.FILE_NAME_SYS_SETTINGS));
 
             // Monitors
             sc.AddSingleton<ISettingsMonitor<AppSettings>, SettingsMonitor<AppSettings>>();
+            sc.AddSingleton<ISettingsMonitor<UserSettings>, SettingsMonitor<UserSettings>>();
             sc.AddSingleton<ISettingsMonitor<SystemSettings>, SettingsMonitor<SystemSettings>>();
 
             // Settings popup MVVM
-            sc.AddTransient<AppSettingsViewModel>();
-            sc.AddTransient<AppSettingsWindow>();
+            sc.AddTransient<UserSettingsViewModel>();
+            sc.AddTransient<UserSettingsWindow>();
 
             // Main
             sc.AddSingleton<MainWindow>();
@@ -94,6 +136,8 @@ namespace LGCNS.axink.App
             var systemSettingsMon = _serviceProvider.GetRequiredService<ISettingsMonitor<SystemSettings>>();
             //AppSettings 읽기
             var appSettingsMon = _serviceProvider.GetRequiredService<ISettingsMonitor<AppSettings>>();
+            //UserSettings 읽기
+            var userSettingsMon = _serviceProvider.GetRequiredService<ISettingsMonitor<UserSettings>>();
             //EvenBus
             var bus = _serviceProvider.GetRequiredService<IEventBus>();
 
@@ -158,9 +202,29 @@ namespace LGCNS.axink.App
 
             var messenger = _serviceProvider.GetRequiredService<IMessenger>();
 
-            var main = new MainWindow(systemSettingsMon, appSettingsMon, messenger, deviceChangeHub, webViewBridge);
-            MainWindow = main;
-            main.Show();
+            if (!string.IsNullOrEmpty(CompanyCode))
+            {
+                var main = new MainWindow(userSettingsMon, systemSettingsMon, appSettingsMon, messenger, deviceService, deviceChangeHub, webViewBridge);
+                MainWindow = main;
+                main.Show();
+            }
+            else
+            {
+                var selector = new CompanySelectWindow(defaultAppSettings.TenantListUrl, string.Empty);
+                if (selector.ShowDialog() == true)
+                {
+                    CompanyCode = selector.SelectedCompanyCode;
+                    RegistryUtils.SaveCompanyCode(CompanyCode);
+                    appSettingsMon.Current.CompanyCode = CompanyCode;
+                    var main = new MainWindow(userSettingsMon, systemSettingsMon, appSettingsMon, messenger, deviceService, deviceChangeHub, webViewBridge);
+                    MainWindow = main;
+                    main.Show();
+                }
+                else
+                {
+                    Shutdown();
+                }
+            }
 
 
             // 글로벌 예외 처리
@@ -211,7 +275,7 @@ namespace LGCNS.axink.App
 
         public static bool? ShowWebViewSourceSettingsDialog(Window owner)
         {
-            var win = _serviceProvider.GetRequiredService<AppSettingsWindow>();
+            var win = _serviceProvider.GetRequiredService<UserSettingsWindow>();
             win.Owner = owner;
             return win.ShowDialog();
         }

@@ -13,8 +13,8 @@
 		</xsl:copy>
 	</xsl:template>
 
-	<!-- LGCNS.DesktopAudioHub.App.exe 파일에 고정 ID 부여 -->
-	<xsl:template match="wix:File[substring(@Source, string-length(@Source) - string-length('axink.exe') + 1) = 'axink.exe']/@Id">
+	<!-- axink Translator.exe 파일에 고정 ID 부여 -->
+	<xsl:template match="wix:File[substring(@Source, string-length(@Source) - string-length('axink Translator.exe') + 1) = 'axink Translator.exe']/@Id">
 		<xsl:attribute name="Id">MainExeFile</xsl:attribute>
 	</xsl:template>
 
