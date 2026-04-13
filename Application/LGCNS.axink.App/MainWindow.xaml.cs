@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace LGCNS.axink.App
 {
@@ -95,6 +96,7 @@ namespace LGCNS.axink.App
             WebViewBridge webViewBridge)
         {
             InitializeComponent();
+            SyncThemeMenu();
 
             _userSettings = userSettings;
             _sysSettings = sysSettings;
@@ -130,8 +132,23 @@ namespace LGCNS.axink.App
 
                 if (type == "showDeviceWindow")
                 {
-                    var win = new Windows.DeviceControllerWindow(_deviceService, _deviceChangeHub, this);
+                    var win = new DeviceControllerWindow(_deviceService, _deviceChangeHub, this);
                     win.ShowDialog();
+                }
+                else if (type == "initCompany")
+                {
+                    var result = AlertDialog.ShowOk(
+                        this,
+                        title: "설정을 저장했습니다.",
+                        message: "변경한 내용이 정상적으로 적용되었습니다.",
+                        dialogTitle: "알림",
+                        footerText: "확인을 누르면 창이 닫힙니다.");
+
+                    if (result == AlertDialogResult.Ok)
+                    {
+                        RegistryUtils.SaveCompanyCode("");
+                        Application.Current.Shutdown();
+                    }
                 }
                 else
                 {
@@ -170,8 +187,49 @@ namespace LGCNS.axink.App
             });
         }
 
+        /**
+         * 폰트확인을 위해
+         */
+        private void DumpEmbeddedFontNames()
+        {
+            var candidates = new[]
+            {
+        "./Assets/#LG EI Text TTF Regular",
+        "./Assets/LGEITextTTF-Regular#LG EI Text",
+        "./Assets/LGEITextTTF-Regular#LG EI Text TTF Regular",
+        "./Assets/LGEITextTTF-Regular#LG EI Text Regular"
+    };
+
+            foreach (var candidate in candidates)
+            {
+                try
+                {
+                    var family = new FontFamily(new Uri("pack://application:,,,/"), candidate);
+
+                    Debug.WriteLine($"[FONT TEST] Candidate: {candidate}");
+
+                    foreach (var typeface in family.GetTypefaces())
+                    {
+                        if (typeface.TryGetGlyphTypeface(out var glyph))
+                        {
+                            var familyName = glyph.FamilyNames.Values.FirstOrDefault();
+                            var faceName = glyph.FaceNames.Values.FirstOrDefault();
+
+                            Debug.WriteLine($"  Family={familyName}, Face={faceName}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[FONT TEST] Failed: {candidate} / {ex.Message}");
+                }
+            }
+        }
+
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+
+            //DumpEmbeddedFontNames();
             try
             {
                 // 저장된 위치/크기 복원
@@ -250,7 +308,7 @@ namespace LGCNS.axink.App
 
             // 최소 크기 보장
             if (Width < 200) Width = 700;
-            if (Height < 100) Height = 800;
+            if (Height < 100) Height = 1000;
         }
 
         protected override void OnClosed(EventArgs e)
@@ -265,6 +323,7 @@ namespace LGCNS.axink.App
         {
             try
             {
+
                 WebView.CoreWebView2InitializationCompleted += WebView_CoreWebView2InitializationCompleted;
 
                 var userDataFolder = Path.Combine(
@@ -279,6 +338,7 @@ namespace LGCNS.axink.App
                 await WebView.EnsureCoreWebView2Async(env);
 
                 NavigateIfPossible(_userSettings.Current.WebViewSource);
+
             }
             catch (Exception ex)
             {
@@ -436,6 +496,9 @@ namespace LGCNS.axink.App
                 }
             }
 
+            mmi.ptMinTrackSize.X = 600;   // MinWidth
+            mmi.ptMinTrackSize.Y = 800;   // MinHeight
+
             Marshal.StructureToPtr(mmi, lParam, true);
         }
 
@@ -465,6 +528,32 @@ namespace LGCNS.axink.App
                     RegistryUtils.SaveCompanyCode(selector.SelectedCompanyCode);
                     Application.Current.Shutdown();
                 }
+            }
+        }
+
+        private void SyncThemeMenu()
+        {
+            var theme = ThemeManager.Current;
+
+            LightThemeMenuItem.IsChecked = theme == AppTheme.Light;
+            DarkThemeMenuItem.IsChecked = theme == AppTheme.Dark;
+        }
+
+        private void ThemeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem item && item.Tag is string theme)
+            {
+                switch (theme)
+                {
+                    case "Light":
+                        ThemeManager.Apply(AppTheme.Light);
+                        break;
+
+                    case "Dark":
+                        ThemeManager.Apply(AppTheme.Dark);
+                        break;
+                }
+                SyncThemeMenu();
             }
         }
     }

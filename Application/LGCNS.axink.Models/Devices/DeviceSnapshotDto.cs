@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LGCNS.axink.Models.Devices
 {
-    public sealed record AudioDeviceDto(string Id, string Name, bool IsDefault);
+    public sealed record AudioDeviceDto(string Id, string Name, bool IsDefault, string Endpoint, string DeviceFriendlyName);
 
     public sealed record DefaultDeviceRequest(string? deviceType, string? deviceId);
 

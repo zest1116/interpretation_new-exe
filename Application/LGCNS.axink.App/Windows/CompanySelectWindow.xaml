@@ -193,7 +193,7 @@
                     </Button.Template>
                 </Button>
 
-                <Button Grid.Column="2" Content="{DynamicResource Dic_Common_Confirm}" Height="38" FontSize="14"
+                <Button Grid.Column="2" Content="{DynamicResource Dic_Common_Ok}" Height="38" FontSize="14"
                         Foreground="White" Cursor="Hand" Click="BtnOk_Click" IsDefault="True">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">

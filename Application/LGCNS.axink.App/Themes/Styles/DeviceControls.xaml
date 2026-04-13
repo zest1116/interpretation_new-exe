@@ -1,0 +1,156 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+    <!-- 섹션 카드 -->
+    <Style x:Key="SettingsSectionCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PanelBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="Padding" Value="18"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <!-- 상단 안내 카드 -->
+    <Style x:Key="SettingsGuideCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource PanelSubtleBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PanelBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <!-- 하단 액션바 -->
+    <Style x:Key="DialogFooterBarStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource FooterBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource SeparatorBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <!-- 장치 카드 -->
+    <Style x:Key="ModernDeviceItemBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="14,10"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource DeviceHoverBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource DeviceItemBorderBrush}"/>
+            </Trigger>
+
+            <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource DeviceSelectedBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource DeviceSelectedBorderBrush}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- 기본 장치 뱃지 -->
+    <Style x:Key="DeviceDefaultBadgeStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource DeviceBadgeBackgroundBrush}"/>
+        <Setter Property="CornerRadius" Value="11"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- 장치 아이템 템플릿 -->
+    <DataTemplate x:Key="ModernDeviceItemTemplate">
+        <Border Style="{StaticResource ModernDeviceItemBorderStyle}">
+            <Border.InputBindings>
+                <MouseBinding Gesture="LeftClick"
+                      Command="{Binding SelectDeviceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                      CommandParameter="{Binding}" />
+            </Border.InputBindings>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 좌측 상태 -->
+                <Border Grid.Column="0"
+                        Width="34"
+                        Height="34"
+                        CornerRadius="17"
+                        Background="{DynamicResource PanelSubtleBackgroundBrush}"
+                        VerticalAlignment="Center">
+                    <Ellipse Width="10"
+                             Height="10"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{DynamicResource DeviceStatusIdleBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                        <Setter Property="Fill" Value="{DynamicResource AccentBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                </Border>
+
+                <!-- 텍스트 -->
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Endpoint}"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource DeviceTextNormalBrush}"
+                               TextTrimming="CharacterEllipsis">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource DeviceTextNormalBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource DeviceTextDefaultBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <TextBlock Text="{Binding DeviceFriendlyName}" Margin="0,2,0,0"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextSecondaryBrush}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <!--<Setter Property="Text" Value="클릭하여 기본 장치로 설정"/>-->
+                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                        <!--<Setter Property="Text" Value="현재 기본 장치로 사용 중"/>-->
+                                        <Setter Property="Foreground" Value="{DynamicResource DeviceTextDefaultBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- 기본 장치 배지 -->
+                <Border Grid.Column="3"
+                        Style="{StaticResource DeviceDefaultBadgeStyle}"
+                        Margin="12,0,0,0"
+                        Visibility="{Binding IsDefault, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="기본 장치"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource DeviceBadgeForegroundBrush}"/>
+                </Border>
+            </Grid>
+        </Border>
+    </DataTemplate>
+</ResourceDictionary>

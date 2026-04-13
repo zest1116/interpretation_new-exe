@@ -30,7 +30,10 @@ namespace LGCNS.axink.App.Services
                 .Select(d => new AudioDeviceDto(
                     Id: d.Id,
                     Name: d.Name,
-                    IsDefault: d.isDefault
+                    IsDefault: d.isDefault,
+                    Endpoint: d.Endpoint,
+                    DeviceFriendlyName: d.DeviceFriendlyName
+
                 ))
                 .ToList();
 
@@ -38,7 +41,9 @@ namespace LGCNS.axink.App.Services
                     .Select(d => new AudioDeviceDto(
                         Id: d.Id,
                         Name: d.Name,
-                        IsDefault: d.isDefault
+                        IsDefault: d.isDefault,
+                        Endpoint: d.Endpoint,
+                        DeviceFriendlyName: d.DeviceFriendlyName
                     ))
                     .ToList();
 

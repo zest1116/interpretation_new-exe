@@ -13,10 +13,16 @@ namespace LGCNS.axink.Models.Devices
     {
 
         public string Id { get; set; } = string.Empty;
+
         public string Name { get; set; } = string.Empty;
+
         public bool IsInput { get; set; }
 
         public bool isDefault { get; set; }
+
+        public string? Endpoint { get; set; }
+
+        public string? DeviceFriendlyName { get; set;  }
 
         public override string ToString() => Name;
     }

@@ -12,17 +12,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Page Remove="Resources\String.en.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<Content Include="LGCNS.DesktopAudioHub.App.ico" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="Resources\String.en.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -38,7 +28,6 @@
 		<ProjectReference Include="..\LGCNS.axink.Audio\LGCNS.axink.Audio.csproj" />
 		<ProjectReference Include="..\LGCNS.axink.Common\LGCNS.axink.Common.csproj" />
 		<ProjectReference Include="..\LGCNS.axink.Models\LGCNS.axink.Models.csproj" />
-		<ProjectReference Include="..\LGCNS.axink.Models\LGCNS.axink.Models.csproj" />
 		<ProjectReference Include="..\LGCNS.axink.WebHosting\LGCNS.axink.WebHosting.csproj" />
 	</ItemGroup>
 
@@ -46,6 +35,7 @@
 		<Resource Include="Assets\LGCNS.DesktopAudioHub.App.png">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Resource>
+		<Resource Include="Assets\LGEITextTTF-Regular.ttf" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -58,6 +48,18 @@
 		<None Update="appsettings.Production.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Resources\String.en.xaml">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Page>
+	  <Page Update="Resources\String.zh.xaml">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Page>
+	  <Page Update="Resources\Strings.ko.xaml">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Page>
 	</ItemGroup>
 	
 </Project>

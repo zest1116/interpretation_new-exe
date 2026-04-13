@@ -150,9 +150,7 @@ namespace LGCNS.axink.App.Services
         {
             try
             {
-
                 var devices = await _deviceService.GetSnapshotAsync(CancellationToken.None);
-
 
                 var json = JsonConvert.SerializeObject(devices);
                 if (json == _lastPayloadJson)

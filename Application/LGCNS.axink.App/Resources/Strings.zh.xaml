@@ -1,19 +1,30 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <sys:String x:Key="Dic_Common_Confirm">确认</sys:String>
+    <sys:String x:Key="Dic_Common_Ok">Ok</sys:String>
     <sys:String x:Key="Dic_Common_Cancel">取消</sys:String>
     <sys:String x:Key="Dic_Common_Save">保存</sys:String>
+    <sys:String x:Key="Dic_Common_Information">Information</sys:String>
+    <sys:String x:Key="Dic_Common_Yes">Yes</sys:String>
+    <sys:String x:Key="Dic_Common_No">No</sys:String>
+    <sys:String x:Key="Dic_Common_Confirm">Confirm</sys:String>
     <sys:String x:Key="Dic_Menu_File">文件</sys:String>
     <sys:String x:Key="Dic_Menu_Config">设置</sys:String>
     <sys:String x:Key="Dic_Menu_Audio">音频设备</sys:String>
+    <sys:String x:Key="Dic_Menu_Theme">Theme</sys:String>
     <sys:String x:Key="Dic_Menu_Close">退出</sys:String>
     <sys:String x:Key="Dic_Title_Config">设置</sys:String>
     <sys:String x:Key="Dic_Title_Audio">音频设备</sys:String>
+    <sys:String x:Key="Dic_Title_Audio_Desc">스피커와 마이크는 각각 별도로 설정할 수 있으며, 장치를 클릭하면 즉시 적용됩니다.</sys:String>
     <sys:String x:Key="Dic_CompanySelect">选择公司</sys:String>
     <sys:String x:Key="Msg_SelectCompany">请选择您所属的公司</sys:String>
     <sys:String x:Key="Msg_SelectCompany_PlaceHolder">请选择公司</sys:String>
     <sys:String x:Key="Dic_Set_WebViewUrl">WebView URL 设置</sys:String>
     <sys:String x:Key="Dic_Device_Speaker">扬声器</sys:String>
-    <sys:String x:Key="Dic_Device_Mic">麦克风</sys:String>
+    <sys:String x:Key="Dic_Device_Speaker_SubTitle">출력 장치 목록</sys:String>
+    <sys:String x:Key="Dic_Device_Mic">마이크</sys:String>
+    <sys:String x:Key="Dic_Device_Mic_SubTitle">입력 장치 목록</sys:String>
+    <sys:String x:Key="Dic_Device_Default">默认设备</sys:String>
+    <sys:String x:Key="Msg_Notification_Speaker">{0}이(가) 스피커로 사용됩니다.</sys:String>
+    <sys:String x:Key="Msg_Notification_Mic">{0}이(가) 마이크로 사용됩니다.</sys:String>
 </ResourceDictionary>

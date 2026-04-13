@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel.__Internals;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using LGCNS.axink.App.Services;
 using LGCNS.axink.App.ViewModels;
 using LGCNS.axink.App.Windows;
@@ -11,11 +10,9 @@ using LGCNS.axink.Common.Monitors;
 using LGCNS.axink.Models.Devices;
 using LGCNS.axink.Models.Settings;
 using LGCNS.axink.WebHosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -89,6 +86,9 @@ namespace LGCNS.axink.App
             {
                 defaultAppSettings.CompanyCode = CompanyCode;
             }
+
+            // 테마
+            ThemeManager.Apply(AppTheme.Dark);
 
             //로깅 초기화
             Logging.Init(Consts.APP_NAME, Consts.APP_COMPANY);
@@ -210,7 +210,7 @@ namespace LGCNS.axink.App
             }
             else
             {
-                var selector = new CompanySelectWindow(defaultAppSettings.TenantListUrl, string.Empty);
+                var selector = new Windows.CompanySelectWindow(defaultAppSettings.TenantListUrl, string.Empty);
                 if (selector.ShowDialog() == true)
                 {
                     CompanyCode = selector.SelectedCompanyCode;
@@ -233,6 +233,17 @@ namespace LGCNS.axink.App
                 MessageBox.Show($"오류가 발생했습니다: {args.Exception.Message}",
                     "오류", MessageBoxButton.OK, MessageBoxImage.Error);
                 args.Handled = true;
+            };
+
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+            {
+                MessageBox.Show($"도메인 예외: {e.ExceptionObject}");
+            };
+
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                MessageBox.Show($"Task 예외: {e.Exception}");
+                e.SetObserved();
             };
         }
 

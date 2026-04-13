@@ -39,6 +39,36 @@ namespace LGCNS.axink.App.Windows
 
         private async void GetTenantList(string? tenantListUrl, string? companyCode)
         {
+            List<TenantInfo> tenantInfos = new ();
+            tenantInfos.Add(new TenantInfo
+            {
+                CompanyCd = "GIM006",
+                CompanyName = "LG CNS",
+                ServiceName = "a:xink Translator",
+                Domain = "trqa.dt.lgcns.com",
+                Url = "https://trqa.dt.lgcns.com"
+            });
+            tenantInfos.Add(new TenantInfo
+            {
+                CompanyCd = "GIM007",
+                CompanyName = "LG 전자",
+                ServiceName = "a:xink Translator",
+                Domain = "trqa.dt.lgcns.com",
+                Url = "https://trqa.dt.lgcns.com"
+            });
+
+            CmbCompanies.ItemsSource = tenantInfos;
+
+            if (!string.IsNullOrEmpty(companyCode))
+            {
+                var selectedCompany = tenantInfos?.Find(x => x.CompanyCd == companyCode);
+                if (selectedCompany != null)
+                {
+                    CmbCompanies.SelectedItem = selectedCompany;
+                }
+            }
+
+            /*
             if (!string.IsNullOrEmpty(tenantListUrl))
             {
                 var tenants = await ApiClient.GetAsync<List<TenantInfo>>(tenantListUrl);
@@ -54,6 +84,7 @@ namespace LGCNS.axink.App.Windows
                     }
                 }
             }
+            */
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)

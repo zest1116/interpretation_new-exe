@@ -1,4 +1,5 @@
-﻿using LGCNS.axink.App.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using LGCNS.axink.App.Services;
 using LGCNS.axink.Common;
 using LGCNS.axink.Models.Devices;
 using System;
@@ -25,12 +26,34 @@ namespace LGCNS.axink.App.Windows
         private readonly IDeviceService _deviceService;
         private readonly DeviceChangeHub _deviceChangeHub;
 
+        public ICommand SelectDeviceCommand { get; }
+
         public DeviceControllerWindow(
             IDeviceService deviceService,
             DeviceChangeHub deviceChangeHub,
             Window owner)
         {
             InitializeComponent();
+
+#pragma warning disable CA1416 // 플랫폼 호환성 유효성 검사
+            SelectDeviceCommand = new RelayCommand<AudioDeviceDto>(async device =>
+            {
+                if (device == null || device.IsDefault) return;
+
+                try
+                {
+                    var deviceType = (SpeakerList.ItemsSource as IReadOnlyList<AudioDeviceDto>)?
+                        .Any(d => d.Id == device.Id) == true ? "output" : "input";
+
+                    await _deviceService.SetDefaultDevice(deviceType, device.Id, CancellationToken.None);
+                    await RefreshDevicesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Logging.Error(ex, "[AudioDeviceWindow] 기본 장치 변경 실패");
+                }
+            });
+#pragma warning restore CA1416 // 플랫폼 호환성 유효성 검사
 
             _deviceService = deviceService;
             _deviceChangeHub = deviceChangeHub;
@@ -94,5 +117,7 @@ namespace LGCNS.axink.App.Windows
                 Close();
             }
         }
+
+        
     }
 }

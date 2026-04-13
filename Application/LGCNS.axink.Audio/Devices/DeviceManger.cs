@@ -14,7 +14,7 @@ namespace LGCNS.axink.Audio.Devices
             {
                 var defaultInputId = defaultDevice.ID;
                 var collection = enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
-
+                
                 foreach (var device in collection)
                 {
                     devices.Add(new AudioDeviceInfo
@@ -23,6 +23,8 @@ namespace LGCNS.axink.Audio.Devices
                         Name = device.FriendlyName,
                         IsInput = true,
                         isDefault = device.ID == defaultInputId,
+                        Endpoint = device.Properties[PropertyKeys.PKEY_Device_DeviceDesc].Value.ToString(),
+                        DeviceFriendlyName = device.Properties[PropertyKeys.PKEY_DeviceInterface_FriendlyName].Value.ToString()
                     });
                 }
             }
@@ -47,6 +49,8 @@ namespace LGCNS.axink.Audio.Devices
                         Name = device.FriendlyName,
                         IsInput = false,
                         isDefault = device.ID == defaultOutputId,
+                        Endpoint = device.Properties[PropertyKeys.PKEY_Device_DeviceDesc].Value.ToString(),
+                        DeviceFriendlyName = device.Properties[PropertyKeys.PKEY_DeviceInterface_FriendlyName].Value.ToString()
                     });
                 }
             }

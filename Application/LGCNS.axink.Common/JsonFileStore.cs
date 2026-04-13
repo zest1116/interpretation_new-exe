@@ -78,10 +78,10 @@ namespace LGCNS.axink.Common
                 var targetVal = prop.GetValue(target);
                 var sourceVal = prop.GetValue(source);
 
-                var isEmpty = targetVal is null
-                           || (targetVal is string s && string.IsNullOrEmpty(s));
+                //var isEmpty = targetVal is null
+                //           || (targetVal is string s && string.IsNullOrEmpty(s));
 
-                if (isEmpty && sourceVal is not null)
+                if (sourceVal is not null)
                 {
                     prop.SetValue(target, sourceVal);
                 }

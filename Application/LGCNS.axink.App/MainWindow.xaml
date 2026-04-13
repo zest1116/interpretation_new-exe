@@ -7,13 +7,13 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
         Title="axink"
-        Width="800"
-        Height="600"
+        Width="600"
+        Height="1000"
         MinWidth="600"
-        MinHeight="800"
+        MinHeight="1000"
         WindowStyle="None"
         ResizeMode="CanResize"
-        Background="#F3F3F3"
+        Background="{DynamicResource WindowBackgroundBrush}"
         AllowsTransparency="False"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">
@@ -22,17 +22,17 @@
         <shell:WindowChrome CaptionHeight="32"
                             ResizeBorderThickness="8"
                             GlassFrameThickness="0"
-                            CornerRadius="0"
+                            CornerRadius="10"
                             UseAeroCaptionButtons="False"/>
     </shell:WindowChrome.WindowChrome>
 
     <Grid x:Name="RootGrid"
-          Background="{StaticResource WindowBackgroundBrush}">
+          Background="{DynamicResource WindowBackgroundBrush}">
 
         <Border x:Name="MainFrame"
                 Margin="1"
-                Background="{StaticResource WindowBackgroundBrush}"
-                BorderBrush="{StaticResource WindowBorderBrush}"
+                Background="{DynamicResource WindowBackgroundBrush}"
+                BorderBrush="{DynamicResource WindowBorderBrush}"
                 BorderThickness="0"
                 CornerRadius="10"
                 SnapsToDevicePixels="True">
@@ -47,7 +47,7 @@
                 <!-- Title Bar -->
                 <Border x:Name="TitleBarBorder"
                         Grid.Row="0"
-                        Background="{StaticResource TitleBarBrush}"
+                        Background="{DynamicResource TitleBarBackgroundBrush}"
                         BorderThickness="0"
                         CornerRadius="10,10,0,0">
                     <Grid x:Name="TitleBar"
@@ -81,7 +81,7 @@
                                 <TextBlock Text="a:xink Translator"
                                            Margin="8,0,0,0"
                                            VerticalAlignment="Center"
-                                           Foreground="{StaticResource TitleForegroundBrush}"
+                                           Foreground="{DynamicResource TitleBarForegroundBrush}"
                                            FontSize="12"
                                            FontWeight="SemiBold"/>
                             </StackPanel>
@@ -100,7 +100,7 @@
                                     shell:WindowChrome.IsHitTestVisibleInChrome="True">
 
                             <!-- 최소화 -->
-                            <Button Style="{StaticResource CaptionButtonStyle}"
+                            <Button Style="{DynamicResource CaptionButtonStyle}"
                                     Click="Minimize_Click">
                                 <Grid Width="10" Height="10" Margin="0,-1,0,0">
                                     <Rectangle Height="1"
@@ -112,7 +112,7 @@
 
                             <!-- 최대화 / 복원 -->
                             <Button x:Name="MaxBtn"
-                                    Style="{StaticResource CaptionButtonStyle}"
+                                    Style="{DynamicResource CaptionButtonStyle}"
                                     Click="Maximize_Click">
                                 <Grid Width="10" Height="10" Margin="0,-1,0,0">
                                     <Path x:Name="MaximizeGlyph"
@@ -138,7 +138,7 @@
                             </Button>
 
                             <!-- 닫기 -->
-                            <Button Style="{StaticResource CloseButtonStyle}"
+                            <Button Style="{DynamicResource CloseButtonStyle}"
                                     Click="Close_Click">
                                 <Grid Width="10" Height="10" Margin="0,-1,0,0">
                                     <Path Data="M 1,1 L 9,9 M 9,1 L 1,9"
@@ -155,16 +155,29 @@
 
                 <!-- Menu Bar -->
                 <Border Grid.Row="1"
-                        Background="{StaticResource MenuBarBrush}"
+                        Background="{DynamicResource MenuBarBackgroundBrush}"
                         Padding="4,0,0,0">
-                    <Menu Style="{StaticResource MenuBarStyle}"
+                    <Menu Style="{DynamicResource MenuBarStyle}"
                           VerticalAlignment="Center">
-                        <MenuItem Header="{DynamicResource Dic_Menu_File}" Style="{StaticResource MenuItemTopLevelStyle}">
-                            <MenuItem Header="{DynamicResource Dic_Menu_Config}" Style="{StaticResource SubMenuItemStyle}" Click="Config_Click"/>
-                            <MenuItem Header="{DynamicResource Dic_Menu_Audio}" Style="{StaticResource SubMenuItemStyle}" Click="AuditoDevice_Click"/>
-                            <MenuItem Header="{DynamicResource Dic_CompanySelect}" Style="{StaticResource SubMenuItemStyle}" Click="CompanySelect_Click"/>
-                            <Separator Style="{StaticResource SubMenuSeparatorStyle}"/>
-                            <MenuItem Header="{DynamicResource Dic_Menu_Close}" Style="{StaticResource SubMenuItemStyle}" Click="Exit_Click"/>
+                        <MenuItem Header="{DynamicResource Dic_Menu_File}" Style="{DynamicResource MenuItemTopLevelStyle}">
+                            <MenuItem Header="{DynamicResource Dic_Menu_Config}" Style="{DynamicResource SubMenuItemStyle}" Click="Config_Click"/>
+                            <MenuItem Header="{DynamicResource Dic_Menu_Audio}" Style="{DynamicResource SubMenuItemStyle}" Click="AuditoDevice_Click"/>
+                            <MenuItem Header="{DynamicResource Dic_CompanySelect}" Style="{DynamicResource SubMenuItemStyle}" Click="CompanySelect_Click"/>
+                            <MenuItem Header="{DynamicResource Dic_Menu_Theme}" Style="{DynamicResource SubMenuItemStyle}">
+                                <MenuItem x:Name="LightThemeMenuItem"
+                                          Header="Light"
+                                          IsCheckable="True"
+                                          Click="ThemeMenuItem_Click"
+                                          Tag="Light"/>
+
+                                <MenuItem x:Name="DarkThemeMenuItem"
+                                          Header="Dark"
+                                          IsCheckable="True"
+                                          Click="ThemeMenuItem_Click"
+                                          Tag="Dark"/>
+                            </MenuItem>
+                            <Separator Style="{DynamicResource SubMenuSeparatorStyle}"/>
+                            <MenuItem Header="{DynamicResource Dic_Menu_Close}" Style="{DynamicResource SubMenuItemStyle}" Click="Exit_Click"/>
                         </MenuItem>
                     </Menu>
                 </Border>
@@ -172,12 +185,24 @@
                 <!-- Content -->
                 <Border x:Name="ContentBorder"
                         Grid.Row="2"
-                        Background="{StaticResource ContentBackgroundBrush}"
+                        Background="{DynamicResource ContentBackgroundBrush}"
                         CornerRadius="0,0,10,10"
                         ClipToBounds="True">
-                    <wv2:WebView2 x:Name="WebView"
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="8"/>
+                        </Grid.RowDefinitions>
+
+                        <wv2:WebView2  Grid.Row="0" x:Name="WebView"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"/>
+
+                        <!-- 하단 리사이즈용 여유 영역 -->
+                        <Border Grid.Row="1"
+                            Background="Transparent"
+                            IsHitTestVisible="False"/>
+                    </Grid>
                 </Border>
             </Grid>
         </Border>
