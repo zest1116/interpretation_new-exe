@@ -1,9 +1,9 @@
-﻿using System;
+﻿using LGCNS.axink.Common;
+using System;
 using System.Windows;
 
 namespace LGCNS.axink.App;
 
-public enum AppTheme { Light, Dark }
 
 public static class ThemeManager
 {

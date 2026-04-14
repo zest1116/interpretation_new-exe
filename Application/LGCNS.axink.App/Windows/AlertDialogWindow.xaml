@@ -13,10 +13,12 @@
         MinWidth="420"
         MinHeight="200"
         ResizeMode="NoResize"
+        WindowStyle="None"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource WindowBackgroundBrush}"
+        Background="Transparent"
         SnapsToDevicePixels="True"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        AllowsTransparency="True">
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="32"
                         ResizeBorderThickness="8"
@@ -24,69 +26,73 @@
                         CornerRadius="10"
                         UseAeroCaptionButtons="False"/>
     </shell:WindowChrome.WindowChrome>
-    <Border x:Name="MainFrame"
+    <Grid SnapsToDevicePixels="True"
+      UseLayoutRounding="True">
+        <Border x:Name="MainFrame"
             Background="{DynamicResource DialogBackgroundBrush}"
             BorderBrush="{DynamicResource DialogBorderBrush}"
             BorderThickness="1"
-            CornerRadius="{DynamicResource CornerRadiusLarge}"
-            SnapsToDevicePixels="True">
+            CornerRadius="10"
+            SnapsToDevicePixels="True" UseLayoutRounding="True"
+            RenderOptions.EdgeMode="Unspecified"
+            RenderOptions.BitmapScalingMode="HighQuality">
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="32"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="64"/>
-            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="64"/>
+                </Grid.RowDefinitions>
 
-            <controls:ThemedTitleBar Grid.Row="0" Title="{DynamicResource Dic_Common_Information}"/>
+                <controls:ThemedTitleBar Grid.Row="0" Title="{DynamicResource Dic_Common_Information}"/>
 
-            <!-- Content -->
-            <Border Grid.Row="1"
+                <!-- Content -->
+                <Border Grid.Row="1"
                     Background="{DynamicResource DialogSurfaceBrush}"
-                    Margin="16,16,16,12"
+                    Margin="12,12,12,12"
                     CornerRadius="{DynamicResource CornerRadiusMedium}"
                     BorderBrush="{DynamicResource PanelBorderBrush}"
                     BorderThickness="1">
-                <Grid Margin="20,18">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="12"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                    <Grid Margin="20,18">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="12"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0"
+                        <TextBlock Grid.Row="0"
                                Text="{Binding MessageTitle, RelativeSource={RelativeSource AncestorType=Window}}"
                                FontSize="18"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
                                TextWrapping="Wrap"/>
 
-                    <TextBlock Grid.Row="2"
+                        <TextBlock Grid.Row="2"
                                Text="{Binding MessageBody, RelativeSource={RelativeSource AncestorType=Window}}"
                                FontSize="13"
                                LineHeight="22"
                                Foreground="{DynamicResource TextSecondaryBrush}"
                                TextWrapping="Wrap"/>
-                </Grid>
-            </Border>
+                    </Grid>
+                </Border>
 
-            <!-- Footer -->
-            <Border Grid.Row="2"
+                <!-- Footer -->
+                <Border Grid.Row="2"
                     Background="{DynamicResource FooterBackgroundBrush}"
                     BorderBrush="{DynamicResource SeparatorBrush}"
                     BorderThickness="0,1,0,0"
                     CornerRadius="0,0,10,10">
-                <Grid Margin="16,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid Margin="16,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
 
-                    <StackPanel Grid.Column="1"
+                        <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        <Button x:Name="NoButton"
+                            <Button x:Name="NoButton"
                                 Width="96"
                                 Height="38"
                                 Margin="0,0,8,0"
@@ -95,7 +101,7 @@
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 Click="NoButton_Click"/>
 
-                        <Button x:Name="YesButton"
+                            <Button x:Name="YesButton"
                                 Width="96"
                                 Height="{DynamicResource Dic_Common_Yes}"
                                 Margin="0,0,8,0"
@@ -104,16 +110,17 @@
                                 Style="{StaticResource PrimaryButtonStyle}"
                                 Click="YesButton_Click"/>
 
-                        <Button x:Name="OkButton"
+                            <Button x:Name="OkButton"
                                 Width="96"
                                 Height="38"
                                 Content="{DynamicResource Dic_Common_Ok}"
                                 Visibility="Collapsed"
                                 Style="{StaticResource PrimaryButtonStyle}"
                                 Click="OkButton_Click"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-        </Grid>
-    </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

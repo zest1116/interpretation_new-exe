@@ -10,7 +10,7 @@
         Width="600"
         Height="1000"
         MinWidth="600"
-        MinHeight="1000"
+        MinHeight="800"
         WindowStyle="None"
         ResizeMode="CanResize"
         Background="{DynamicResource WindowBackgroundBrush}"
@@ -191,10 +191,10 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="3"/>
                         </Grid.RowDefinitions>
 
-                        <wv2:WebView2  Grid.Row="0" x:Name="WebView"
+                        <wv2:WebView2  Grid.Row="0" x:Name="WebView" 
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"/>
 

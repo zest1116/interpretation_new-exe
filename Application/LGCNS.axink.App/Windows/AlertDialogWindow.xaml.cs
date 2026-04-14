@@ -1,19 +1,8 @@
 ﻿using LGCNS.axink.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace LGCNS.axink.App.Windows
 {
@@ -23,15 +12,14 @@ namespace LGCNS.axink.App.Windows
             Window? owner,
             string title,
             string message,
-            string dialogTitle = "알림",
-            string? footerText = null)
+            string? dialogTitle = null)
         {
+            dialogTitle = Application.Current.Resources["Dic_Common_Information"].ToString() ?? "알림";
             var dialog = new AlertDialogWindow(
                 dialogTitle: dialogTitle,
                 messageTitle: title,
                 messageBody: message,
                 buttonSet: AlertDialogButtonSet.Ok,
-                footerText: footerText,
                 owner: owner);
 
             dialog.ShowDialog();
@@ -42,15 +30,14 @@ namespace LGCNS.axink.App.Windows
             Window? owner,
             string title,
             string message,
-            string dialogTitle = "확인",
-            string? footerText = null)
+            string? dialogTitle = null)
         {
+            dialogTitle = Application.Current.Resources["Dic_Common_Confirm"].ToString() ?? "확인";
             var dialog = new AlertDialogWindow(
                 dialogTitle: dialogTitle,
                 messageTitle: title,
                 messageBody: message,
                 buttonSet: AlertDialogButtonSet.YesNo,
-                footerText: footerText,
                 owner: owner);
 
             dialog.ShowDialog();
@@ -70,7 +57,7 @@ namespace LGCNS.axink.App.Windows
         public string DialogTitle { get; }
         public string MessageTitle { get; }
         public string MessageBody { get; }
-        public string FooterText { get; }
+        
         public AlertDialogResult Result { get; private set; } = AlertDialogResult.None;
 
         [DllImport("dwmapi.dll")]
@@ -85,15 +72,13 @@ namespace LGCNS.axink.App.Windows
             string messageTitle,
             string messageBody,
             AlertDialogButtonSet buttonSet,
-            string? footerText = null,
             Window? owner = null)
         {
             InitializeComponent();
-
-            DialogTitle = string.IsNullOrWhiteSpace(dialogTitle) ? "알림" : dialogTitle;
+            dialogTitle = Application.Current.Resources["Dic_Common_Information"].ToString() ?? "알림";
+            DialogTitle = dialogTitle;
             MessageTitle = messageTitle;
             MessageBody = messageBody;
-            FooterText = string.IsNullOrWhiteSpace(footerText) ? string.Empty : footerText;
 
             DataContext = this;
             Owner = owner;
@@ -131,8 +116,8 @@ namespace LGCNS.axink.App.Windows
 
         private void AlertDialogWindow_SourceInitialized(object? sender, EventArgs e)
         {
-            ApplyCornerPreference();
-            UpdateVisualState();
+            //ApplyCornerPreference();
+            //UpdateVisualState();
         }
 
         private void UpdateVisualState()

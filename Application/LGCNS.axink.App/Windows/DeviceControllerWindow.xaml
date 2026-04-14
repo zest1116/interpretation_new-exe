@@ -10,11 +10,13 @@
         Width="540"
         Height="800"
         ResizeMode="NoResize"
+        WindowStyle="None"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource WindowBackgroundBrush}"
+        Background="Transparent"
         PreviewKeyDown="Window_PreviewKeyDown"        
         SnapsToDevicePixels="True"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        AllowsTransparency="True">
 
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="32"
@@ -24,11 +26,15 @@
                             UseAeroCaptionButtons="False"/>
     </shell:WindowChrome.WindowChrome>
 
-    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+    <Grid SnapsToDevicePixels="True"
+          UseLayoutRounding="True">
         <Border Background="{DynamicResource WindowBackgroundBrush}"
                 BorderBrush="{DynamicResource WindowBorderBrush}"
                 BorderThickness="1"
-                CornerRadius="10">
+                CornerRadius="10"
+                SnapsToDevicePixels="True" UseLayoutRounding="True"
+                RenderOptions.EdgeMode="Unspecified"
+                RenderOptions.BitmapScalingMode="HighQuality">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="32"/>

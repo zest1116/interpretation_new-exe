@@ -10,4 +10,8 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LGCNS.axink.Common\LGCNS.axink.Common.csproj" />
+  </ItemGroup>
+
 </Project>

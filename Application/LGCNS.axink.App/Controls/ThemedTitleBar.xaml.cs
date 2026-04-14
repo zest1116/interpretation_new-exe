@@ -114,21 +114,21 @@ namespace LGCNS.axink.App.Controls
             if (window == null)
                 return;
 
-            if (e.ClickCount == 2 && window.ResizeMode != ResizeMode.NoResize)
-            {
-                window.WindowState = window.WindowState == WindowState.Maximized
-                    ? WindowState.Normal
-                    : WindowState.Maximized;
-                return;
-            }
+            //if (e.ClickCount == 2 && window.ResizeMode != ResizeMode.NoResize)
+            //{
+            //    window.WindowState = window.WindowState == WindowState.Maximized
+            //        ? WindowState.Normal
+            //        : WindowState.Maximized;
+            //    return;
+            //}
 
-            try
-            {
-                window.DragMove();
-            }
-            catch
-            {
-            }
+            //try
+            //{
+            //    //window.DragMove();
+            //}
+            //catch
+            //{
+            //}
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

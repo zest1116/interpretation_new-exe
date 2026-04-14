@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LGCNS.axink.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,6 @@ namespace LGCNS.axink.Models.Settings
         public string? SavedAudioFileRoot { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
         public string? TenantListUrl { get; set; }
+
     }
 }

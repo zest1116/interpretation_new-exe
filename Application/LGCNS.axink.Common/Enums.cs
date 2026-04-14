@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace LGCNS.axink.Common
 {
+    public enum AppTheme { Light, Dark }
+
+
     public enum AudioSourceType
     {
         Mic = 1,

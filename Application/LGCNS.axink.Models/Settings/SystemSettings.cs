@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LGCNS.axink.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,9 @@ namespace LGCNS.axink.Models.Settings
         public double WindowHeight { get; set; }
 
         public int WindowState { get; set; }
+
+        public AppTheme AppTheme { get; set; }
+
 
     }
 }

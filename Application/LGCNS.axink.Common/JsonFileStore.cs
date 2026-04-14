@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.Json;
 
 namespace LGCNS.axink.Common
@@ -86,6 +88,29 @@ namespace LGCNS.axink.Common
                     prop.SetValue(target, sourceVal);
                 }
             }
+        }
+
+        public void UpdateProperty<TProp>(
+            Expression<Func<T, TProp>> selector,
+            TProp value)
+        {
+            if (selector.Body is not MemberExpression memberExpr)
+                throw new ArgumentException("Property selector만 지원됩니다.");
+
+            if (memberExpr.Member is not PropertyInfo prop)
+                throw new ArgumentException("Property만 지정해야 합니다.");
+
+            if (!prop.CanWrite)
+                throw new InvalidOperationException($"속성 {prop.Name}은(는) 쓰기 불가입니다.");
+
+            // 현재 데이터 로드
+            var current = LoadOrCreate();
+
+            // 값 설정
+            prop.SetValue(current, value);
+
+            // 저장
+            Save(current);
         }
     }
 }

@@ -116,8 +116,21 @@ namespace LGCNS.axink.App
             {
                 NavigateIfPossible(msg.Value.WebViewSource);
             });
+
+            SizeChanged += MainWindow_SizeChanged;
+            WebView.SizeChanged += WebView_SizeChanged;
         }
 
+        private void WebView_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Logging.Debug($"[Resize] WebView: {e.NewSize.Width:F0} x {e.NewSize.Height:F0}  " +
+                  $"(ActualSize: {WebView.ActualWidth:F0} x {WebView.ActualHeight:F0})");
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Logging.Debug($"[Resize] Window: {e.NewSize.Width:F0} x {e.NewSize.Height:F0}");
+        }
 
         private async void CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
@@ -139,10 +152,9 @@ namespace LGCNS.axink.App
                 {
                     var result = AlertDialog.ShowOk(
                         this,
-                        title: "설정을 저장했습니다.",
-                        message: "변경한 내용이 정상적으로 적용되었습니다.",
-                        dialogTitle: "알림",
-                        footerText: "확인을 누르면 창이 닫힙니다.");
+                        title: Application.Current.Resources["Msg_Init_Company"].ToString() ?? "프로그램을 초기화 했습니다.",
+                        message: "",
+                        dialogTitle: "알림");
 
                     if (result == AlertDialogResult.Ok)
                     {
@@ -474,7 +486,7 @@ namespace LGCNS.axink.App
             return IntPtr.Zero;
         }
 
-        private static void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
+        private  void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
         {
             var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
 
@@ -496,8 +508,19 @@ namespace LGCNS.axink.App
                 }
             }
 
-            mmi.ptMinTrackSize.X = 600;   // MinWidth
-            mmi.ptMinTrackSize.Y = 800;   // MinHeight
+            // 현재 창의 DPI 배율 계산 (100%일 때 1.0, 150%일 때 1.5)
+            double dpiX = 1.0;
+            double dpiY = 1.0;
+            PresentationSource source = PresentationSource.FromVisual(this);
+            if (source?.CompositionTarget != null)
+            {
+                dpiX = source.CompositionTarget.TransformToDevice.M11;
+                dpiY = source.CompositionTarget.TransformToDevice.M22;
+            }
+
+            // XAML에 설정한 MinWidth(600), MinHeight(800) 값에 DPI를 곱해서 OS에 전달
+            mmi.ptMinTrackSize.X = (int)(600 * dpiX);
+            mmi.ptMinTrackSize.Y = (int)(800 * dpiY);
 
             Marshal.StructureToPtr(mmi, lParam, true);
         }
@@ -543,16 +566,24 @@ namespace LGCNS.axink.App
         {
             if (sender is MenuItem item && item.Tag is string theme)
             {
+                AppTheme appTheme = AppTheme.Light;
                 switch (theme)
                 {
                     case "Light":
                         ThemeManager.Apply(AppTheme.Light);
+                        appTheme = AppTheme.Light;
                         break;
 
                     case "Dark":
                         ThemeManager.Apply(AppTheme.Dark);
+                        appTheme = AppTheme.Dark;
                         break;
                 }
+
+                var store = new JsonFileStore<SystemSettings>(Consts.APP_NAME, Consts.FILE_NAME_SYS_SETTINGS);
+                _sysSettings.Current.AppTheme = appTheme;
+                store.UpdateProperty(x => x.AppTheme, appTheme);
+
                 SyncThemeMenu();
             }
         }

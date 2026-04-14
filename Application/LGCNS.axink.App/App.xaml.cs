@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Media;
 
 namespace LGCNS.axink.App
 {
@@ -60,6 +61,7 @@ namespace LGCNS.axink.App
                 return;
             }
 
+            RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.Default;
             base.OnStartup(e);
 
             //언어설정
@@ -87,8 +89,6 @@ namespace LGCNS.axink.App
                 defaultAppSettings.CompanyCode = CompanyCode;
             }
 
-            // 테마
-            ThemeManager.Apply(AppTheme.Dark);
 
             //로깅 초기화
             Logging.Init(Consts.APP_NAME, Consts.APP_COMPANY);
@@ -108,7 +108,7 @@ namespace LGCNS.axink.App
             // 2. JsonFileStore — 로컬 파일 없으면 기본값으로 시드
             sc.AddSingleton(sp =>
             {
-                var store = new JsonFileStore<AppSettings>(Consts.APP_NAME, Consts.FILE_NAME_APP_SETTINGS);
+                var store = new JsonFileStore<AppSettings>(Consts.APP_NAME, Consts.FILE_NAME_APP_SETTINGS);                
                 store.LoadOrCreate(defaultAppSettings);  // 최초 1회만 파일 생성
                 return store;
             }); 
@@ -140,6 +140,9 @@ namespace LGCNS.axink.App
             var userSettingsMon = _serviceProvider.GetRequiredService<ISettingsMonitor<UserSettings>>();
             //EvenBus
             var bus = _serviceProvider.GetRequiredService<IEventBus>();
+
+            // 테마
+            ThemeManager.Apply(systemSettingsMon.Current.AppTheme == AppTheme.Dark ? AppTheme.Dark: AppTheme.Light);
 
 
             _server = new LocalServerHost();

@@ -11,7 +11,9 @@
         Grid.Row="0"
         Background="{StaticResource TitleBarBackgroundBrush}"
         BorderThickness="0"
-        CornerRadius="10,10,0,0">
+        CornerRadius="10,10,0,0"
+            UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
         <Grid x:Name="TitleBar"
           MouseLeftButtonDown="DragArea_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
@@ -40,7 +42,7 @@
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                     </Border>
 
-                    <TextBlock Text="a:xink Translator"
+                    <TextBlock x:Name="WindowTitle" Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
                            Margin="8,0,0,0"
                            VerticalAlignment="Center"
                            Foreground="{StaticResource TitleBarForegroundBrush}"
