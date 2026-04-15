@@ -27,5 +27,7 @@
     <sys:String x:Key="Dic_Device_Default">기본 장치</sys:String>
     <sys:String x:Key="Msg_Notification_Speaker">{0}이(가) 스피커로 사용됩니다.</sys:String>
     <sys:String x:Key="Msg_Notification_Mic">{0}이(가) 마이크로 사용됩니다.</sys:String>
+    <sys:String x:Key="Msg_Notification_Device_Added">{0}이(가) 연결되었습니다.</sys:String>
+    <sys:String x:Key="Msg_Notification_Device_Removed">{0}이(가) 연결 해제되었습니다.</sys:String>
     <sys:String x:Key="Msg_Init_Company">프로그램을 초기화 했습니다.</sys:String>
 </ResourceDictionary>

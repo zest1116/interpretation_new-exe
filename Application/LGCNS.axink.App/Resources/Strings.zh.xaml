@@ -27,5 +27,7 @@
     <sys:String x:Key="Dic_Device_Default">默认</sys:String>
     <sys:String x:Key="Msg_Notification_Speaker">已将 {0} 设为扬声器。</sys:String>
     <sys:String x:Key="Msg_Notification_Mic">已将 {0} 设为麦克风。</sys:String>
+    <sys:String x:Key="Msg_Notification_Device_Added">{0} 已连接。</sys:String>
+    <sys:String x:Key="Msg_Notification_Device_Removed">{0} 已断开连接。</sys:String>
     <sys:String x:Key="Msg_Init_Company">应用已重置。</sys:String>
 </ResourceDictionary>

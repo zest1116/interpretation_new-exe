@@ -1,0 +1,80 @@
+﻿<Window x:Class="LGCNS.axink.App.Windows.NotificationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LGCNS.axink.App.Windows"
+        mc:Ignorable="d"
+        Title="NotificationWindow" Height="100" Width="600"
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        Background="Transparent"
+        ShowInTaskbar="False" 
+        ShowActivated="False"
+        Topmost="False"
+        SizeToContent="WidthAndHeight">
+    <Window.Resources>
+        <Storyboard x:Key="FadeInStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0" Duration="0:0:0.3"/>
+            <DoubleAnimation Storyboard.TargetProperty="(Window.RenderTransform).(TranslateTransform.X)"
+                             From="50" To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Window.Resources>
+
+    <Window.RenderTransform>
+        <TranslateTransform X="0"/>
+    </Window.RenderTransform>
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource FadeInStoryboard}"/>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <Border x:Name="MainBorder"
+            Background="{DynamicResource NotificationBackgroundBrush}" 
+            BorderBrush="{DynamicResource NotificationBorderBrush}" 
+            BorderThickness="1"
+            CornerRadius="{DynamicResource CornerRadiusMedium}" 
+            Padding="15" 
+            Margin="0, 0, 5, 0">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="10" 
+                              Opacity="0.2" 
+                              ShadowDepth="2" 
+                              Color="Black"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Rectangle Grid.Column="0" 
+                       Width="4" 
+                       Fill="{DynamicResource NotificationInfoAccentBrush}" 
+                       Margin="0,0,12,0"
+                       RadiusX="2" RadiusY="2"/>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <!--<TextBlock x:Name="TitleText" 
+                           Text="알림" 
+                           Foreground="{DynamicResource NotificationTitleBrush}" 
+                           FontSize="14" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,4"/>-->
+
+                <TextBlock x:Name="MessageText" 
+                           Foreground="{DynamicResource NotificationMessageBrush}" 
+                           FontSize="13" 
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

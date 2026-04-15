@@ -12,6 +12,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Controls\NotificationItem.xaml.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Remove="Controls\NotificationItem.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="LGCNS.DesktopAudioHub.App.ico" />
 	</ItemGroup>
 

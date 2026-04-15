@@ -119,4 +119,23 @@
     <SolidColorBrush x:Key="ScrollBarThumbBrush" Color="#668B93A1"/>
     <SolidColorBrush x:Key="ScrollBarThumbHoverBrush" Color="#99B5BDC9"/>
     <SolidColorBrush x:Key="ScrollBarThumbPressedBrush" Color="#CCD5DBE3"/>
+
+    <!-- Notification -->
+    <SolidColorBrush x:Key="NotificationBackgroundBrush" Color="#2A2B3C"/>
+    <SolidColorBrush x:Key="NotificationBorderBrush" Color="#45475A"/>
+    <SolidColorBrush x:Key="NotificationTitleBrush" Color="#F5F7FB"/>
+    <SolidColorBrush x:Key="NotificationMessageBrush" Color="#C7CAD6"/>
+    <SolidColorBrush x:Key="NotificationShadowBrush" Color="#000000"/>
+
+    <SolidColorBrush x:Key="NotificationInfoAccentBrush" Color="#89B4FA"/>
+    <SolidColorBrush x:Key="NotificationInfoAccentBackgroundBrush" Color="#24324A"/>
+
+    <SolidColorBrush x:Key="NotificationSuccessAccentBrush" Color="#6EE7B7"/>
+    <SolidColorBrush x:Key="NotificationSuccessAccentBackgroundBrush" Color="#1F3B36"/>
+
+    <SolidColorBrush x:Key="NotificationWarningAccentBrush" Color="#FBBF24"/>
+    <SolidColorBrush x:Key="NotificationWarningAccentBackgroundBrush" Color="#45351F"/>
+
+    <SolidColorBrush x:Key="NotificationErrorAccentBrush" Color="#F87171"/>
+    <SolidColorBrush x:Key="NotificationErrorAccentBackgroundBrush" Color="#4A2525"/>
 </ResourceDictionary>

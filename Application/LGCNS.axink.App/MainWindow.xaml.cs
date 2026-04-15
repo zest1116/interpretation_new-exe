@@ -6,6 +6,7 @@ using LGCNS.axink.Common.Monitors;
 using LGCNS.axink.Models.Devices;
 using LGCNS.axink.Models.Settings;
 using Microsoft.Web.WebView2.Core;
+using NAudio.CoreAudioApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
@@ -85,6 +86,7 @@ namespace LGCNS.axink.App
         private readonly IDeviceService _deviceService;
         private readonly DeviceChangeHub _deviceChangeHub;
         private readonly WebViewBridge _webViewBridge;
+        private DeviceSnapshotDto? _lastDeviceSnapshot;
 
         public MainWindow(
             ISettingsMonitor<UserSettings> userSettings,
@@ -112,25 +114,20 @@ namespace LGCNS.axink.App
             Closing += MainWindow_Closing;
             StateChanged += MainWindow_StateChanged;
 
+            // 창 위치가 바뀔 때
+            this.LocationChanged += (s, e) => NotificationHelper.RearrangeNotifications(this);
+
+            // 창 크기가 바뀔 때 (알림이 창 밖으로 나가는 것 방지)
+            this.SizeChanged += (s, e) => NotificationHelper.RearrangeNotifications(this);
+
             _messenger.Register<SettingsChangedMessage<UserSettings>>(this, (_, msg) =>
             {
                 NavigateIfPossible(msg.Value.WebViewSource);
             });
 
-            SizeChanged += MainWindow_SizeChanged;
-            WebView.SizeChanged += WebView_SizeChanged;
+            _lastDeviceSnapshot = deviceService.GetSnapshotAsync(CancellationToken.None).Result;
         }
 
-        private void WebView_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Logging.Debug($"[Resize] WebView: {e.NewSize.Width:F0} x {e.NewSize.Height:F0}  " +
-                  $"(ActualSize: {WebView.ActualWidth:F0} x {WebView.ActualHeight:F0})");
-        }
-
-        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Logging.Debug($"[Resize] Window: {e.NewSize.Width:F0} x {e.NewSize.Height:F0}");
-        }
 
         private async void CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
@@ -185,6 +182,64 @@ namespace LGCNS.axink.App
         {
             Dispatcher.Invoke(() =>
             {
+                Logging.Debug(JsonConvert.SerializeObject(e.Devices));
+                var deviceSnapshot = JsonConvert.DeserializeObject<DeviceSnapshotDto>(e.Devices);
+                if (deviceSnapshot == null)
+                    return;
+
+                var summary = DeviceSnapshotDiffer.Diff(_lastDeviceSnapshot, deviceSnapshot);
+
+                _lastDeviceSnapshot = deviceSnapshot;
+
+                if (!summary.HasAnyChange)
+                    return;
+
+                // ── 기본 장치 변경 ──
+                if (summary.DefaultInputChange is { NewId: { } newId })
+                {
+                    var device = deviceSnapshot.Inputs.FirstOrDefault(d => d.Id == newId);
+                    if (device is not null)
+                    {
+                        var tpl = Application.Current.Resources["Msg_Notification_Mic"] as string;
+                        NotificationHelper.Show(this, string.Format(tpl!, device.Name));
+                    }
+                }
+
+                if (summary.DefaultOutputChange is { NewId: { } newId2 })
+                {
+                    var device = deviceSnapshot.Outputs.FirstOrDefault(d => d.Id == newId2);
+                    if (device is not null)
+                    {
+                        var tpl = Application.Current.Resources["Msg_Notification_Speaker"] as string;
+                        NotificationHelper.Show(this, string.Format(tpl!, device.Name));
+                    }
+                }
+
+                // ── 장치 추가 ──
+                foreach (var d in summary.AddedInputs)
+                {
+                    var tpl = Application.Current.Resources["Msg_Notification_Device_Added"] as string;
+                    NotificationHelper.Show(this, string.Format(tpl!, d.Name));
+                }
+                foreach (var d in summary.AddedOutputs)
+                {
+                    var tpl = Application.Current.Resources["Msg_Notification_Device_Added"] as string;
+                    NotificationHelper.Show(this, string.Format(tpl!, d.Name));
+                }
+
+                // ── 장치 제거 ──
+                foreach (var d in summary.RemovedInputs)
+                {
+                    var tpl = Application.Current.Resources["Msg_Notification_Device_Removed"] as string;
+                    NotificationHelper.Show(this, string.Format(tpl!, d.Name));
+                }
+                foreach (var d in summary.RemovedOutputs)
+                {
+                    var tpl = Application.Current.Resources["Msg_Notification_Device_Removed"] as string;
+                    NotificationHelper.Show(this, string.Format(tpl!, d.Name));
+                }
+
+                /* WebView2로 전달하지 않음
                 if (WebView?.CoreWebView2 != null)
                 {
                     var data = new
@@ -193,9 +248,9 @@ namespace LGCNS.axink.App
                         data = JsonConvert.DeserializeObject(e.Devices)
                     };
 
-                    Logging.Debug(JsonConvert.SerializeObject(data));
                     WebView.CoreWebView2.PostWebMessageAsJson(JsonConvert.SerializeObject(data));
                 }
+                */
             });
         }
 

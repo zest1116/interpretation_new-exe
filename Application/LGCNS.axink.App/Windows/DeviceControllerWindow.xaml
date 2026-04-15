@@ -196,7 +196,7 @@
                                    Text="장치를 클릭하면 즉시 기본 장치가 변경됩니다."/>-->
 
                         <Button Grid.Column="1"
-                                Content="확인"
+                                Content="{DynamicResource Dic_Common_Ok}"
                                 Style="{DynamicResource PrimaryButtonStyle}"
                                 Click="Confirm_Click"
                                 IsDefault="True"

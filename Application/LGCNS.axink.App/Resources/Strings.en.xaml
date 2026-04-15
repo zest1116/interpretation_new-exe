@@ -24,8 +24,10 @@
     <sys:String x:Key="Dic_Device_Speaker_SubTitle">Output</sys:String>
     <sys:String x:Key="Dic_Device_Mic">Microphone</sys:String>
     <sys:String x:Key="Dic_Device_Mic_SubTitle">Input</sys:String>
-    <sys:String x:Key="Dic_Device_Default">Default</sys:String>
+    <sys:String x:Key="Dic_Device_Default">Default device</sys:String>
     <sys:String x:Key="Msg_Notification_Speaker">{0} set as speaker.</sys:String>
     <sys:String x:Key="Msg_Notification_Mic">{0} set as microphone.</sys:String>
+    <sys:String x:Key="Msg_Notification_Device_Added">{0} has been connected.</sys:String>
+    <sys:String x:Key="Msg_Notification_Device_Removed">{0} has been disconnected.</sys:String>
     <sys:String x:Key="Msg_Init_Company">App reset.</sys:String>
 </ResourceDictionary>
