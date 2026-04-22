@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "LGCNS.axink.Updater": {
+      "commandName": "Project"
+    },
+    "Debug-LGCNS.axink.Updater": {
+      "commandName": "Project",
+      "commandLineArgs": "--pid 29480 --download-url \"http://localhost:8080/LGCNS-axink-0.2.114.0-Development.msi\" --app \"C:\\Users\\이정주\\AppData\\Local\\LGCNS\\axink Translator\\axink Translator.exe\" --version \"0.2.114.0\""
+    }
+  }
+}

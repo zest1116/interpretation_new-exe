@@ -3,7 +3,7 @@
 
     <!-- Window -->
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="WindowBorderBrush" Color="#D9E2EC"/>
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#26000000"/>
     <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FFFFFF"/>
 
     <!-- TitleBar -->

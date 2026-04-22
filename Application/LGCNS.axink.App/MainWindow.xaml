@@ -13,8 +13,8 @@
         MinHeight="800"
         WindowStyle="None"
         ResizeMode="CanResize"
-        Background="{DynamicResource WindowBackgroundBrush}"
-        AllowsTransparency="False"
+        Background="Transparent"
+        AllowsTransparency="True"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">
 
@@ -27,15 +27,19 @@
     </shell:WindowChrome.WindowChrome>
 
     <Grid x:Name="RootGrid"
-          Background="{DynamicResource WindowBackgroundBrush}">
+          SnapsToDevicePixels="True"
+          UseLayoutRounding="True">
 
         <Border x:Name="MainFrame"
-                Margin="1"
+                Margin="0"
                 Background="{DynamicResource WindowBackgroundBrush}"
                 BorderBrush="{DynamicResource WindowBorderBrush}"
-                BorderThickness="0"
+                BorderThickness="1"
                 CornerRadius="10"
-                SnapsToDevicePixels="True">
+                SnapsToDevicePixels="True"
+                UseLayoutRounding="True"
+                RenderOptions.EdgeMode="Unspecified"
+                RenderOptions.BitmapScalingMode="HighQuality">
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -49,7 +53,7 @@
                         Grid.Row="0"
                         Background="{DynamicResource TitleBarBackgroundBrush}"
                         BorderThickness="0"
-                        CornerRadius="10,10,0,0">
+                        CornerRadius="8,8,0,0">
                     <Grid x:Name="TitleBar"
                           MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                         <Grid.ColumnDefinitions>
@@ -168,13 +172,13 @@
                                           Header="Light"
                                           IsCheckable="True"
                                           Click="ThemeMenuItem_Click"
-                                          Tag="Light"/>
+                                          Tag="WHITE"/>
 
                                 <MenuItem x:Name="DarkThemeMenuItem"
                                           Header="Dark"
                                           IsCheckable="True"
                                           Click="ThemeMenuItem_Click"
-                                          Tag="Dark"/>
+                                          Tag="BLACK"/>
                             </MenuItem>
                             <Separator Style="{DynamicResource SubMenuSeparatorStyle}"/>
                             <MenuItem Header="{DynamicResource Dic_Menu_Close}" Style="{DynamicResource SubMenuItemStyle}" Click="Exit_Click"/>
@@ -186,12 +190,12 @@
                 <Border x:Name="ContentBorder"
                         Grid.Row="2"
                         Background="{DynamicResource ContentBackgroundBrush}"
-                        CornerRadius="0,0,10,10"
+                        CornerRadius="0,0,9,9"
                         ClipToBounds="True">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="3"/>
+                            <RowDefinition Height="5"/>
                         </Grid.RowDefinitions>
 
                         <wv2:WebView2  Grid.Row="0" x:Name="WebView" 

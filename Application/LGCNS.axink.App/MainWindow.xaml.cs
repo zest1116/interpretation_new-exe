@@ -3,15 +3,14 @@ using LGCNS.axink.App.Services;
 using LGCNS.axink.App.Windows;
 using LGCNS.axink.Common;
 using LGCNS.axink.Common.Monitors;
+using LGCNS.axink.Models.ApiResponse;
 using LGCNS.axink.Models.Devices;
 using LGCNS.axink.Models.Settings;
 using Microsoft.Web.WebView2.Core;
-using NAudio.CoreAudioApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -41,6 +40,17 @@ namespace LGCNS.axink.App
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowRgn(IntPtr hWnd, IntPtr hRgn, bool bRedraw);
+
+        [DllImport("user32.dll")]
+        private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("gdi32.dll")]
+        private static extern IntPtr CreateRoundRectRgn(
+            int nLeftRect, int nTopRect, int nRightRect, int nBottomRect,
+            int nWidthEllipse, int nHeightEllipse);
 
         [StructLayout(LayoutKind.Sequential)]
         private struct POINT
@@ -77,6 +87,16 @@ namespace LGCNS.axink.App
             public int dwFlags;
         }
 
+
+        private const int WM_SIZE = 0x0005;
+        private const int WM_DPICHANGED = 0x02E0;
+
+        // 창 둥근 모서리 반경 (XAML의 Border.CornerRadius와 동일해야 함)
+        private const int CORNER_RADIUS = 10;
+
+        // Windows 11(빌드 22000+)은 DWM이 네이티브로 둥근 모서리를 그려줌.
+        // 그 이하 버전은 SetWindowRgn 폴백이 필요.
+        private bool UseRegionFallback => Environment.OSVersion.Version.Build < 22000;
         #endregion
 
         private readonly ISettingsMonitor<UserSettings> _userSettings;
@@ -87,6 +107,7 @@ namespace LGCNS.axink.App
         private readonly DeviceChangeHub _deviceChangeHub;
         private readonly WebViewBridge _webViewBridge;
         private DeviceSnapshotDto? _lastDeviceSnapshot;
+        private readonly TenantInfo _tenantInfo;
 
         public MainWindow(
             ISettingsMonitor<UserSettings> userSettings,
@@ -95,7 +116,8 @@ namespace LGCNS.axink.App
             IMessenger messenger,
             IDeviceService deviceService,
             DeviceChangeHub hub,
-            WebViewBridge webViewBridge)
+            WebViewBridge webViewBridge,
+            TenantInfo tenantInfo)
         {
             InitializeComponent();
             SyncThemeMenu();
@@ -108,6 +130,7 @@ namespace LGCNS.axink.App
             _deviceChangeHub = hub;
             _webViewBridge = webViewBridge;
             _deviceChangeHub.DeviceListChanged += DeviceChangeHub_DeviceListChanged;
+            _tenantInfo = tenantInfo;
 
             SourceInitialized += MainWindow_SourceInitialized;
             Loaded += MainWindow_Loaded;
@@ -151,12 +174,42 @@ namespace LGCNS.axink.App
                         this,
                         title: Application.Current.Resources["Msg_Init_Company"].ToString() ?? "프로그램을 초기화 했습니다.",
                         message: "",
-                        dialogTitle: "알림");
+                        dialogTitle: Application.Current.Resources["Dic_Common_Information"].ToString());
 
                     if (result == AlertDialogResult.Ok)
                     {
                         RegistryUtils.SaveCompanyCode("");
                         Application.Current.Shutdown();
+                    }
+                }
+                else if(type == "changeTheme")
+                {
+                    JToken? data = msg["data"];
+                    if (data != null)
+                    {
+                        var theme = data.Value<string>("theme") ?? "BLACK";
+
+                        AppTheme appTheme = AppTheme.Light;
+                        switch (theme)
+                        {
+                            case "BLUE":
+                            case "WHITE":
+                                ThemeManager.Apply(AppTheme.Light);
+                                appTheme = AppTheme.Light;
+                                break;
+    
+                            case "BLACK":
+                                ThemeManager.Apply(AppTheme.Dark);
+                                appTheme = AppTheme.Dark;
+                                break;
+                        }
+
+                        var store = new JsonFileStore<SystemSettings>(Consts.APP_NAME, Consts.FILE_NAME_SYS_SETTINGS);
+                        _sysSettings.Current.AppTheme = appTheme;
+                        store.UpdateProperty(x => x.AppTheme, appTheme);
+
+                        SyncThemeMenu();
+
                     }
                 }
                 else
@@ -404,7 +457,7 @@ namespace LGCNS.axink.App
                 var env = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
                 await WebView.EnsureCoreWebView2Async(env);
 
-                NavigateIfPossible(_userSettings.Current.WebViewSource);
+                NavigateIfPossible(_tenantInfo.Url);
 
             }
             catch (Exception ex)
@@ -506,9 +559,12 @@ namespace LGCNS.axink.App
             bool maximized = WindowState == WindowState.Maximized;
 
             MainFrame.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(10);
-            TitleBarBorder.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(10, 10, 0, 0);
-            ContentBorder.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(0, 0, 10, 10);
-            MainFrame.Margin = maximized ? new Thickness(0) : new Thickness(1);
+            TitleBarBorder.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(8, 8, 0, 0);
+            ContentBorder.CornerRadius = maximized ? new CornerRadius(0) : new CornerRadius(0, 0, 9, 9);
+            //MainFrame.Margin = maximized ? new Thickness(0) : new Thickness(1);
+
+            // 최대화 시 보더 숨김 (화면 가장자리에 어색한 1px 보이는 것 방지)
+            MainFrame.BorderThickness = maximized ? new Thickness(0) : new Thickness(1);
 
             if (MaximizeGlyph != null && RestoreGlyph != null)
             {
@@ -519,15 +575,56 @@ namespace LGCNS.axink.App
 
         private void ApplyCornerPreference()
         {
-            if (Environment.OSVersion.Version.Build < 22000)
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
+            if (hwnd == IntPtr.Zero) return;
+
+            if (!UseRegionFallback)
+            {
+                // Windows 11+: DWM에 맡김 (앤티앨리어싱 적용되어 가장 깔끔)
+                int pref = WindowState == WindowState.Maximized
+                    ? DWMWCP_DONOTROUND
+                    : DWMWCP_ROUND;
+                DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref pref, Marshal.SizeOf<int>());
+            }
+            else
+            {
+                // Windows 10 / Server 2019·2022: HRGN으로 OS 레벨 클리핑
+                ApplyWindowRegion(hwnd);
+            }
+        }
+
+        private void ApplyWindowRegion(IntPtr hwnd)
+        {
+            // 최대화 상태에서는 region 제거 (전체 화면 영역 사용)
+            if (WindowState == WindowState.Maximized)
+            {
+                SetWindowRgn(hwnd, IntPtr.Zero, true);
+                return;
+            }
+
+            // 실제 디바이스 픽셀 기준 창 크기
+            if (!GetWindowRect(hwnd, out RECT rect))
                 return;
 
-            IntPtr hwnd = new WindowInteropHelper(this).Handle;
-            int pref = WindowState == WindowState.Maximized
-                ? DWMWCP_DONOTROUND
-                : DWMWCP_ROUND;
+            int width = rect.Right - rect.Left;
+            int height = rect.Bottom - rect.Top;
+            if (width <= 0 || height <= 0)
+                return;
 
-            DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref pref, Marshal.SizeOf<int>());
+            // DPI 배율 반영 (100%=1.0, 150%=1.5)
+            double dpiScale = 1.0;
+            var src = PresentationSource.FromVisual(this);
+            if (src?.CompositionTarget != null)
+                dpiScale = src.CompositionTarget.TransformToDevice.M11;
+
+            // CreateRoundRectRgn은 "타원의 가로/세로"를 받으므로 반경의 2배를 넘김
+            int ellipse = (int)Math.Round(CORNER_RADIUS * 2 * dpiScale);
+
+            // +1은 CreateRoundRectRgn이 우·하단을 배타적으로 처리하기 때문
+            IntPtr hrgn = CreateRoundRectRgn(0, 0, width + 1, height + 1, ellipse, ellipse);
+
+            // SetWindowRgn은 hrgn 소유권을 가져가므로 DeleteObject 호출하면 안 됨
+            SetWindowRgn(hwnd, hrgn, true);
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -536,6 +633,11 @@ namespace LGCNS.axink.App
             {
                 WmGetMinMaxInfo(hwnd, lParam);
                 handled = true;
+            }
+            else if ((msg == WM_SIZE || msg == WM_DPICHANGED) && UseRegionFallback)
+            {
+                // 리사이즈/DPI 변경 시 region 재계산
+                ApplyWindowRegion(hwnd);
             }
 
             return IntPtr.Zero;
@@ -598,12 +700,12 @@ namespace LGCNS.axink.App
 
         private void CompanySelect_Click(object sender, RoutedEventArgs e)
         {
-            var selector = new CompanySelectWindow(_appSettings.Current.TenantListUrl, _appSettings.Current.CompanyCode);
+            var selector = new CompanySelectWindow(_appSettings.Current.TenantListUrl, _tenantInfo.CompanyCd);
             if (selector.ShowDialog() == true)
             {
-                if (_appSettings.Current.CompanyCode != selector.SelectedCompanyCode)
+                if (_tenantInfo.CompanyCd != selector.SelectedCompany.CompanyCd)
                 {
-                    RegistryUtils.SaveCompanyCode(selector.SelectedCompanyCode);
+                    RegistryUtils.SaveCompanyCode(selector.SelectedCompany.CompanyCd);
                     Application.Current.Shutdown();
                 }
             }
@@ -624,12 +726,12 @@ namespace LGCNS.axink.App
                 AppTheme appTheme = AppTheme.Light;
                 switch (theme)
                 {
-                    case "Light":
+                    case "WHITE":
                         ThemeManager.Apply(AppTheme.Light);
                         appTheme = AppTheme.Light;
                         break;
 
-                    case "Dark":
+                    case "BLACK":
                         ThemeManager.Apply(AppTheme.Dark);
                         appTheme = AppTheme.Dark;
                         break;

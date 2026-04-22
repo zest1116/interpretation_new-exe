@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using LGCNS.axink.App.Services;
+using LGCNS.axink.App.Updater;
 using LGCNS.axink.App.ViewModels;
 using LGCNS.axink.App.Windows;
 using LGCNS.axink.Audio;
@@ -7,6 +8,7 @@ using LGCNS.axink.Audio.Devices;
 using LGCNS.axink.Common;
 using LGCNS.axink.Common.Interfaces;
 using LGCNS.axink.Common.Monitors;
+using LGCNS.axink.Models.ApiResponse;
 using LGCNS.axink.Models.Devices;
 using LGCNS.axink.Models.Settings;
 using LGCNS.axink.WebHosting;
@@ -36,6 +38,8 @@ namespace LGCNS.axink.App
 
         //Web Hosting
         private LocalServerHost? _server;
+
+        private UpdateService _updateService;
 
         /// <summary>
         /// 회사코드
@@ -84,12 +88,6 @@ namespace LGCNS.axink.App
             // 1. 환경별 기본값 로드 (appsettings.json)
             var defaultAppSettings = AppConfigLoader.LoadSection<AppSettings>("AppSettings");
 
-            if (!string.IsNullOrEmpty(CompanyCode))
-            {
-                defaultAppSettings.CompanyCode = CompanyCode;
-            }
-
-
             //로깅 초기화
             Logging.Init(Consts.APP_NAME, Consts.APP_COMPANY);
 
@@ -108,10 +106,10 @@ namespace LGCNS.axink.App
             // 2. JsonFileStore — 로컬 파일 없으면 기본값으로 시드
             sc.AddSingleton(sp =>
             {
-                var store = new JsonFileStore<AppSettings>(Consts.APP_NAME, Consts.FILE_NAME_APP_SETTINGS);                
+                var store = new JsonFileStore<AppSettings>(Consts.APP_NAME, Consts.FILE_NAME_APP_SETTINGS);
                 store.LoadOrCreate(defaultAppSettings);  // 최초 1회만 파일 생성
                 return store;
-            }); 
+            });
             sc.AddSingleton(sp => new JsonFileStore<UserSettings>(Consts.APP_NAME, Consts.FILE_NAME_USER_SETTINGS));
             sc.AddSingleton(sp => new JsonFileStore<SystemSettings>(Consts.APP_NAME, Consts.FILE_NAME_SYS_SETTINGS));
 
@@ -142,7 +140,7 @@ namespace LGCNS.axink.App
             var bus = _serviceProvider.GetRequiredService<IEventBus>();
 
             // 테마
-            ThemeManager.Apply(systemSettingsMon.Current.AppTheme == AppTheme.Dark ? AppTheme.Dark: AppTheme.Light);
+            ThemeManager.Apply(systemSettingsMon.Current.AppTheme == AppTheme.Dark ? AppTheme.Dark : AppTheme.Light);
 
 
             _server = new LocalServerHost();
@@ -194,7 +192,7 @@ namespace LGCNS.axink.App
             // ✅ Kestrel DI에서 디바이스 서비스 꺼내오기
             var deviceService = _server.Services.GetRequiredService<IDeviceService>();
 
-            // ✅ WPF DI에서 디바이스 리스너 꺼내기
+            // WPF DI에서 디바이스 리스너 꺼내기
             var deviceListener = _serviceProvider.GetRequiredService<DeviceNotificationListener>();
 
             var deviceChangeHub = new DeviceChangeHub(deviceListener, deviceService, webCapture, bus);
@@ -205,21 +203,57 @@ namespace LGCNS.axink.App
 
             var messenger = _serviceProvider.GetRequiredService<IMessenger>();
 
+
+            var appInfoUrl = appSettingsMon.Current.AppInfoUrl;
+
+            if (!string.IsNullOrEmpty(appInfoUrl))
+            {
+                _updateService = new UpdateService(appInfoUrl);
+
+                var status = await _updateService.CheckForUpdateAsync();
+
+                switch (status)
+                {
+                    case UpdateStatus.MandatoryUpdateRequired:
+                        HandleMandatoryUpdate();
+                        return; // Updater 실행 → 앱 종료됨
+
+                    case UpdateStatus.OptionalUpdateAvailable:
+                        // MainWindow 띄운 후 토스트로 알림 (아래에서 처리)
+                        break;
+
+                    case UpdateStatus.Error:
+                        // 서버 연결 실패 → 무시하고 정상 진행
+                        Debug.WriteLine("[App] Update check failed, continuing normally");
+                        break;
+                }
+            }
+
+
             if (!string.IsNullOrEmpty(CompanyCode))
             {
-                var main = new MainWindow(userSettingsMon, systemSettingsMon, appSettingsMon, messenger, deviceService, deviceChangeHub, webViewBridge);
-                MainWindow = main;
-                main.Show();
+                var tenant = await CheckCompany(appSettingsMon.Current.TenantListUrl, CompanyCode);
+
+                if (tenant != null) {
+                    var main = new MainWindow(userSettingsMon, systemSettingsMon, appSettingsMon, messenger, deviceService, deviceChangeHub, webViewBridge, tenant);
+                    MainWindow = main;
+                    main.Show();
+                }
+                else
+                {
+                    AlertDialog.ShowOk(Application.Current.MainWindow,
+                        title: Application.Current.Resources["Msg_Not_Found_CompanyInfo"].ToString() ?? "회사정보를 가져오지 못했습니다.",
+                        message: "",
+                        dialogTitle: Application.Current.Resources["Dic_Common_Information"].ToString());
+                }
             }
             else
             {
-                var selector = new Windows.CompanySelectWindow(defaultAppSettings.TenantListUrl, string.Empty);
-                if (selector.ShowDialog() == true)
+                var selector = new CompanySelectWindow(appSettingsMon.Current.TenantListUrl, string.Empty);
+                if (selector.ShowDialog() == true && selector.SelectedCompany != null)
                 {
-                    CompanyCode = selector.SelectedCompanyCode;
-                    RegistryUtils.SaveCompanyCode(CompanyCode);
-                    appSettingsMon.Current.CompanyCode = CompanyCode;
-                    var main = new MainWindow(userSettingsMon, systemSettingsMon, appSettingsMon, messenger, deviceService, deviceChangeHub, webViewBridge);
+                    RegistryUtils.SaveCompanyCode(selector.SelectedCompany.CompanyCd);
+                    var main = new MainWindow(userSettingsMon, systemSettingsMon, appSettingsMon, messenger, deviceService, deviceChangeHub, webViewBridge, selector.SelectedCompany);
                     MainWindow = main;
                     main.Show();
                 }
@@ -249,6 +283,46 @@ namespace LGCNS.axink.App
                 e.SetObserved();
             };
         }
+
+        // ─────────────────────────────────────────────────────
+        //  강제 업데이트 처리
+        // ─────────────────────────────────────────────────────
+        private void HandleMandatoryUpdate()
+        {
+            var info = _updateService!.LatestUpdate!;
+
+            MessageBox.Show(
+                $"필수 업데이트가 있습니다.\n\n" +
+                $"최신 버전: v{info.VersionName}\n" +
+                (string.IsNullOrEmpty(info.Changes)
+                    ? ""
+                    : $"\n{info.Changes}\n") +
+                "\n확인을 누르면 업데이트가 시작됩니다.",
+                "axink 업데이트",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            if (!_updateService.LaunchUpdaterAndExit())
+            {
+                // Updater 실행 실패 (파일 없음, UAC 거부 등)
+                // → 앱을 종료하지 않고 에러 안내
+                MessageBox.Show(
+                    "업데이트를 시작할 수 없습니다.\n" +
+                    "관리자에게 문의해주세요.",
+                    "업데이트 오류",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                Shutdown();
+            }
+        }
+
+        private async Task<TenantInfo?> CheckCompany(string tenantListUrl, string companyCode)
+        {
+            var tenants = await ApiClient.GetAsync<List<TenantInfo>>(tenantListUrl);
+
+            return tenants?.Find(x => x.CompanyCd.Equals(companyCode, StringComparison.OrdinalIgnoreCase));
+        }
+
 
         /// <summary>
         /// 기존창을 맨앞으로 올리라고 보냄

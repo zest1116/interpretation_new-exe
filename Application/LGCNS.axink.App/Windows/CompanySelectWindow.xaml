@@ -3,95 +3,91 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:LGCNS.axink.App.Windows"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
-        Title="{DynamicResource Dic_CompanySelect}" Width="420" Height="340"
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
-    <Window.Resources>
-        <!-- 드롭다운 토글 버튼 -->
-        <ControlTemplate x:Key="ComboBoxToggle" TargetType="ToggleButton">
-            <Border x:Name="Bd" Background="White" BorderBrush="#CCC"
-                BorderThickness="1" CornerRadius="8" Padding="12,0">
-                <Grid>
-                    <ContentPresenter/>
-                    <Path x:Name="Arrow" Data="M0,0 L4,4 L8,0" Stroke="#888"
-                      StrokeThickness="1.5" Fill="Transparent"
-                      HorizontalAlignment="Right" VerticalAlignment="Center"
-                      RenderTransformOrigin="0.5,0.5">
-                        <Path.RenderTransform>
-                            <RotateTransform Angle="0"/>
-                        </Path.RenderTransform>
-                    </Path>
-                </Grid>
-            </Border>
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter TargetName="Bd" Property="BorderBrush" Value="#999"/>
-                </Trigger>
-                <Trigger Property="IsChecked" Value="True">
-                    <Setter TargetName="Bd" Property="BorderBrush" Value="#185FA5"/>
-                    <Setter TargetName="Arrow" Property="RenderTransform">
-                        <Setter.Value>
-                            <RotateTransform Angle="180"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
+        Title="{DynamicResource Dic_CompanySelect}"
+        Width="560"
+        Height="350"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        ResizeMode="NoResize"
+        Background="Transparent"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
 
-        <!-- ComboBox 본체 -->
-        <Style x:Key="StyledComboBox" TargetType="ComboBox">
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="FontSize" Value="14"/>
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="44"
+                            ResizeBorderThickness="6"
+                            CornerRadius="0"
+                            GlassFrameThickness="0"
+                            UseAeroCaptionButtons="False"/>
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="WindowBgBrush" Color="#F4F6FA"/>
+        <SolidColorBrush x:Key="CardBgBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#E3E7EE"/>
+        <SolidColorBrush x:Key="TitleBrush" Color="#1B2430"/>
+        <SolidColorBrush x:Key="BodyBrush" Color="#4B5563"/>
+        <SolidColorBrush x:Key="SubtleBrush" Color="#6B7280"/>
+        <SolidColorBrush x:Key="InputBgBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="InputBorderBrush" Color="#D5DBE5"/>
+        <SolidColorBrush x:Key="InputHoverBrush" Color="#BFC8D8"/>
+        <SolidColorBrush x:Key="SectionBgBrush" Color="#F8FAFD"/>
+        <SolidColorBrush x:Key="SectionBorderBrush" Color="#E6EBF2"/>
+        <SolidColorBrush x:Key="PrimaryPinkBrush" Color="#EC397C"/>
+        <SolidColorBrush x:Key="PrimaryPinkHoverBrush" Color="#DA2C6D"/>
+        <SolidColorBrush x:Key="PrimaryPinkPressedBrush" Color="#C92461"/>
+        <SolidColorBrush x:Key="SecondaryButtonBgBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="SecondaryButtonBorderBrush" Color="#D6DCE7"/>
+        <SolidColorBrush x:Key="SecondaryButtonHoverBrush" Color="#F7F9FC"/>
+        <SolidColorBrush x:Key="ErrorBrush" Color="#D92D20"/>
+
+        <Style x:Key="DialogCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBgBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="26"
+                                      ShadowDepth="0"
+                                      Opacity="0.12"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SectionCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SectionBgBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SectionBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="18"/>
+        </Style>
+
+        <Style x:Key="FlatIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ComboBox">
-                        <Grid>
-                            <ToggleButton x:Name="ToggleButton"
-                                      Template="{StaticResource ComboBoxToggle}"
-                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay,
-                                                  RelativeSource={RelativeSource TemplatedParent}}"
-                                      Focusable="False" ClickMode="Press"/>
-
-                            <ContentPresenter x:Name="ContentSite"
-                                          Content="{TemplateBinding SelectionBoxItem}"
-                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                          Margin="14,0,28,0" VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" IsHitTestVisible="False"/>
-
-                            <!-- 플레이스홀더 -->
-                            <TextBlock x:Name="Placeholder" Text="{DynamicResource Msg_SelectCompany_PlaceHolder}"
-                                   Foreground="#AAA" FontSize="14"
-                                   Margin="14,0,28,0" VerticalAlignment="Center"
-                                   IsHitTestVisible="False"
-                                   Visibility="Collapsed"/>
-
-                            <!-- 드롭다운 팝업 -->
-                            <Popup x:Name="PART_Popup" Placement="Bottom"
-                               IsOpen="{TemplateBinding IsDropDownOpen}"
-                               AllowsTransparency="True" Focusable="False"
-                               PopupAnimation="Slide">
-                                <Border x:Name="DropDown" MinWidth="{TemplateBinding ActualWidth}"
-                                    MaxHeight="200" Margin="0,4,0,0"
-                                    Background="White" BorderBrush="#E0E0E0"
-                                    BorderThickness="1" CornerRadius="8"
-                                    Padding="4">
-                                    <Border.Effect>
-                                        <DropShadowEffect Color="#000" Opacity="0.08"
-                                                      BlurRadius="12" ShadowDepth="4"
-                                                      Direction="270"/>
-                                    </Border.Effect>
-                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                        <StackPanel IsItemsHost="True"
-                                                KeyboardNavigation.DirectionalNavigation="Contained"/>
-                                    </ScrollViewer>
-                                </Border>
-                            </Popup>
-                        </Grid>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="SelectedItem" Value="{x:Null}">
-                                <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#F1F4F9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.75"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -99,121 +95,299 @@
             </Setter>
         </Style>
 
-        <!-- 드롭다운 항목 -->
-        <Style x:Key="StyledComboBoxItem" TargetType="ComboBoxItem">
-            <Setter Property="Padding" Value="12,10"/>
-            <Setter Property="Cursor" Value="Hand"/>
+        <Style x:Key="PrimaryActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="MinWidth" Value="96"/>
+            <Setter Property="Padding" Value="18,0"/>
             <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryPinkBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryPinkBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ComboBoxItem">
-                        <Border x:Name="Bd" Padding="{TemplateBinding Padding}"
-                            Background="Transparent" CornerRadius="6">
-                            <ContentPresenter/>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#F5F7FA"/>
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource PrimaryPinkHoverBrush}"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource PrimaryPinkHoverBrush}"/>
                             </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#E6F1FB"/>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource PrimaryPinkPressedBrush}"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource PrimaryPinkPressedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.55"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="MinWidth" Value="96"/>
+            <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TitleBrush}"/>
+            <Setter Property="Background" Value="{StaticResource SecondaryButtonBgBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SecondaryButtonBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource SecondaryButtonHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.82"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CompanyComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                Padding="12,10">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#FCE7F3"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#FCE7F3"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D5DBE5"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="OuterBorder" 
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8"/>
+
+                            <Grid Margin="14,0,36,0">
+                                <ContentPresenter x:Name="SelectionPresenter" 
+                                                  VerticalAlignment="Center"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  IsHitTestVisible="False"/>
+                                <TextBlock x:Name="PlaceholderText" 
+                                           Text="{DynamicResource Msg_SelectCompany_PlaceHolder}"
+                                           Foreground="#9AA3B2" VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ComboBox}}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+
+                            <ToggleButton x:Name="ToggleButton"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Focusable="False"
+                                          ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="Transparent">
+                                            <Path Data="M0,0 L4,4 L8,0" Stroke="#7B8698" StrokeThickness="1.5"
+                                                  HorizontalAlignment="Right" Margin="0,0,14,0" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True">
+                                <Border Background="White" BorderBrush="#D5DBE5" BorderThickness="1" CornerRadius="8" Margin="0,4,0,0"
+                                        MinWidth="{Binding ActualWidth, ElementName=OuterBorder}">
+                                    <ScrollViewer MaxHeight="200">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
     </Window.Resources>
-    <Border Background="White" CornerRadius="12"
-            BorderBrush="#E0E0E0" BorderThickness="1">
-        <Grid Margin="32,28,32,24">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <!-- 상단 헤더 -->
-                <RowDefinition Height="*"/>
-                <!-- 중앙 콘텐츠 (추후) -->
-                <RowDefinition Height="Auto"/>
-                <!-- 하단 버튼 -->
-            </Grid.RowDefinitions>
 
-            <!-- 상단: 아이콘 + 타이틀 + 설명 -->
-            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,20">
-                <Border Width="48" Height="48" CornerRadius="24"
-                        Background="#E6F1FB" HorizontalAlignment="Center" Margin="0,0,0,12">
-                    <Path Data="M3,9 L12,2 L21,9 V20 A2,2 0 0 1 19,22 H5 A2,2 0 0 1 3,20 Z"
-                          Stroke="#185FA5" StrokeThickness="1.8" Fill="Transparent"
-                          Width="22" Height="22" Stretch="Uniform"
-                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Grid>
+        <Border Margin="15"
+                Style="{StaticResource DialogCardStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="52"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="78"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        BorderBrush="#EEF1F6"
+                        BorderThickness="0,0,0,1"
+                        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+                    <Grid Margin="16,0,12,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock VerticalAlignment="Center"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TitleBrush}"
+                                   Text="{DynamicResource Dic_CompanySelect}"/>
+
+                        <Button Grid.Column="1"
+                                Style="{StaticResource FlatIconButtonStyle}"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                Click="BtnCancel_Click">
+                            <Path Width="10"
+                                  Height="10"
+                                  Stretch="Uniform"
+                                  Fill="#6B7280"
+                                  Data="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z"/>
+                        </Button>
+                    </Grid>
                 </Border>
-                <TextBlock Text="{DynamicResource Dic_CompanySelect}" FontSize="17" FontWeight="SemiBold"
-                           HorizontalAlignment="Center"/>
-                <TextBlock Text="{DynamicResource Msg_SelectCompany}" FontSize="13" Foreground="#888"
-                           HorizontalAlignment="Center" Margin="0,4,0,0"/>
-            </StackPanel>
 
-            <!-- 중앙: 회사 선택 -->
-            <StackPanel Grid.Row="1">
-                <ComboBox x:Name="CmbCompanies"
-                  Style="{StaticResource StyledComboBox}"
-                  ItemContainerStyle="{StaticResource StyledComboBoxItem}"
-                  SelectionChanged="CmbCompanies_SelectionChanged">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding CompanyName}" FontSize="14"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <TextBlock x:Name="TxtError" Foreground="#E24B4A" FontSize="12"
-               Margin="0,6,0,0" TextWrapping="Wrap"/>
-            </StackPanel>
+                <Grid Grid.Row="1" Margin="26,18,26,18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="18"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-            <!-- 하단: 버튼 -->
-            <Grid Grid.Row="2" Margin="0,20,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="8"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Row="0">
 
-                <Button Grid.Column="0" Content="{DynamicResource Dic_Common_Cancel}" Height="38" FontSize="14"
-                        Background="Transparent" BorderBrush="#CCC" BorderThickness="1"
-                        Cursor="Hand" Click="BtnCancel_Click">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bd" Background="Transparent"
-                                    BorderBrush="#CCC" BorderThickness="1" CornerRadius="8">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bd" Property="Background" Value="#F5F5F5"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                        <TextBlock Margin="0,8,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource BodyBrush}"
+                                   TextWrapping="Wrap"
+                                   Text="{DynamicResource Msg_SelectCompany}"/>
+                    </StackPanel>
 
-                <Button Grid.Column="2" Content="{DynamicResource Dic_Common_Ok}" Height="38" FontSize="14"
-                        Foreground="White" Cursor="Hand" Click="BtnOk_Click" IsDefault="True">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bd" Background="#185FA5"
-                                    CornerRadius="8">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bd" Property="Background" Value="#1565B8"/>
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="Bd" Property="Background" Value="#0C447C"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                    <Border Grid.Row="2"
+                            Style="{StaticResource SectionCardStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <ComboBox x:Name="CmbCompanies"
+                                  Grid.Row="0"
+                                  Style="{StaticResource ModernComboBoxStyle}"
+                                  ItemContainerStyle="{StaticResource CompanyComboBoxItemStyle}"
+                                  SelectionChanged="CmbCompanies_SelectionChanged"
+                                  IsEditable="False"
+                                  TextSearch.TextPath="CompanyName">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding CompanyName}"
+                                                   FontSize="14"
+                                                   Foreground="#1B2430"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock x:Name="TxtError"
+                                       Grid.Row="2"
+                                       FontSize="12"
+                                       Foreground="{StaticResource ErrorBrush}"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="2"
+                        Background="#FCFDFE"
+                        BorderBrush="#EEF1F6"
+                        BorderThickness="0,1,0,0"
+                        CornerRadius="0,0,18,18">
+                    <Grid Margin="26,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="BtnCancel"
+                                Grid.Column="1"
+                                Style="{StaticResource SecondaryActionButtonStyle}"
+                                Click="BtnCancel_Click"
+                                Content="{DynamicResource Dic_Common_Cancel}"/>
+
+                        <Button x:Name="BtnOk"
+                                Grid.Column="3"
+                                Style="{StaticResource PrimaryActionButtonStyle}"
+                                Click="BtnOk_Click"
+                                IsDefault="True"
+                                Content="{DynamicResource Dic_Common_Ok}"/>
+                    </Grid>
+                </Border>
             </Grid>
-
-        </Grid>
-    </Border>
+        </Border>
+    </Grid>
 </Window>

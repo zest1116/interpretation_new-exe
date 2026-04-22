@@ -32,7 +32,8 @@
                 BorderBrush="{DynamicResource WindowBorderBrush}"
                 BorderThickness="1"
                 CornerRadius="10"
-                SnapsToDevicePixels="True" UseLayoutRounding="True"
+                SnapsToDevicePixels="True" 
+                UseLayoutRounding="True"
                 RenderOptions.EdgeMode="Unspecified"
                 RenderOptions.BitmapScalingMode="HighQuality">
             <Grid>

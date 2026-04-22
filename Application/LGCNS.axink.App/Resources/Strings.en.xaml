@@ -30,4 +30,5 @@
     <sys:String x:Key="Msg_Notification_Device_Added">{0} has been connected.</sys:String>
     <sys:String x:Key="Msg_Notification_Device_Removed">{0} has been disconnected.</sys:String>
     <sys:String x:Key="Msg_Init_Company">App reset.</sys:String>
+    <sys:String x:Key="Msg_Not_Found_CompanyInfo">회사정보를 가져오지 못했습니다.</sys:String>
 </ResourceDictionary>

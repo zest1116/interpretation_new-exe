@@ -25,4 +25,7 @@
       <Platform Solution="*|Any CPU" Project="x64" />
     </Project>
   </Folder>
+  <Folder Name="/Updater/">
+    <Project Path="Updater/LGCNS.axink.Updater/LGCNS.axink.Updater.csproj" Id="64fd2ebe-bbea-441b-b7e4-1d75eafe8e56" />
+  </Folder>
 </Solution>
