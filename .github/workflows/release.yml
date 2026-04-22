@@ -86,6 +86,7 @@ jobs:
           files: |
             releases/*.msi
             releases/*.sha256
-          #draft: ${{ env.APP_ENV != 'Production' }}
+          draft: false
+          prerelease: ${{ env.APP_ENV != 'Production' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
