@@ -90,7 +90,7 @@ if ($PublishOnly) {
 }
 
 # 2. appsettings.json 환경별 병합
-Write-Host "`n[2/3] 환경 설정 병합: $Environment" -ForegroundColor Yellow
+Write-Host "`n[3/4] 환경 설정 병합: $Environment" -ForegroundColor Yellow
 
 $baseConfig = Join-Path $PublishDir "appsettings.json"
 $envConfig  = Join-Path $PublishDir "appsettings.$Environment.json"
@@ -120,9 +120,9 @@ if ($PublishOnly) {
     exit 0
 }
 
-# 2. MSI 빌드
+# MSI 빌드
 if ($BuildMsi) {
-    Write-Host "`n[3/3] Building MSI..." -ForegroundColor Yellow
+    Write-Host "`n[4/4] Building MSI..." -ForegroundColor Yellow
     
     dotnet build "$SolutionDir\Setup\LGCNS.axink.MSI\LGCNS.axink.MSI.wixproj" `
         -c Release `
@@ -132,4 +132,18 @@ if ($BuildMsi) {
         -p:AppEnvironment=$Environment
     
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    # MSI를 releases 폴더로 복사
+    New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
+
+    $msiFile = Get-ChildItem "$SolutionDir\Setup\LGCNS.axink.MSI\bin\x64\Release\ko-KR\*.msi" |
+               Select-Object -First 1
+
+    if ($msiFile) {
+        Copy-Item $msiFile.FullName $OutputDir
+        Write-Host "`nMSI 복사 완료: $OutputDir\$($msiFile.Name)" -ForegroundColor Green
+    } else {
+        Write-Error "MSI 파일을 찾을 수 없습니다."
+        exit 1
+    }
 }
