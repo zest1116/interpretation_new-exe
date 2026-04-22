@@ -18,10 +18,13 @@
 		<xsl:attribute name="Id">MainExeFile</xsl:attribute>
 	</xsl:template>
 
-	<!-- 수동 컴포넌트와 중복되는 Updater 파일을 Heat 수집에서 제외 -->
-	<xsl:template match="wix:Component[contains(wix:File/@Source, 'Updater.exe')]" />
-	<xsl:template match="wix:Component[contains(wix:File/@Source, 'Updater.dll')]" />
-	<xsl:template match="wix:Component[contains(wix:File/@Source, 'Updater.deps.json')]" />
-	<xsl:template match="wix:Component[contains(wix:File/@Source, 'Updater.runtimeconfig.json')]" />
+	<!-- Updater.exe를 Heat 수집에서 제외 (수동 컴포넌트와 중복 방지) -->
+	<xsl:template match="wix:Component[contains(wix:File/@Source, 'axink Translator Updater.exe')]" />
+
+	<!-- 제거된 Component에 대한 ComponentRef도 제거 -->
+	<xsl:key name="UpdaterComponentIds"
+			 match="wix:Component[contains(wix:File/@Source, 'axink Translator Updater.exe')]"
+			 use="@Id" />
+	<xsl:template match="wix:ComponentRef[key('UpdaterComponentIds', @Id)]" />
 
 </xsl:stylesheet>
