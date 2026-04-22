@@ -51,7 +51,7 @@ jobs:
       # ─────────────────────────────────────────
       - name: Build MSI
         run: |
-          .\Script\build.ps1 `
+          .\Scripts\build.ps1 `
             -Version ${{ steps.ver.outputs.VERSION }} `
             -Environment ${{ env.APP_ENV }} `
             -BuildMsi
