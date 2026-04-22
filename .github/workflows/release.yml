@@ -4,11 +4,11 @@ name: Build & Release
 
 on:
   push:
-    tags: ['v*']
+    tags: [ "v*" ]
 
 # 환경 변수
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: "8.0.x"
 
 jobs:
   build:
@@ -50,7 +50,7 @@ jobs:
       #  빌드
       # ─────────────────────────────────────────
       - name: Build MSI
-        run: |
+        run: |+
           .\Scripts\build.ps1 `
             -Version ${{ steps.ver.outputs.VERSION }} `
             -Environment ${{ env.APP_ENV }} `
@@ -70,3 +70,16 @@ jobs:
           echo "SHA256=$($hash.Split(' ')[0])" >> $env:GITHUB_OUTPUT
           echo "MSI: $($msi.Name) ($([math]::Round($msi.Length/1MB, 1)) MB)"
           echo "SHA256: $($hash.Split(' ')[0])"
+
+      # ─────────────────────────────────────────
+      #  GitHub Release 생성 (선택)
+      # ─────────────────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "axink ${{ steps.ver.outputs.VERSION }}"
+          files: |
+            releases/*.msi
+            releases/*.sha256
+          draft: ${{ env.APP_ENV != 'Production' }}
