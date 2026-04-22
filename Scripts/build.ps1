@@ -146,4 +146,16 @@ if ($BuildMsi) {
         Write-Error "MSI 파일을 찾을 수 없습니다."
         exit 1
     }
+    
+    # SHA256 해시 생성
+    $OutputName = $msiFile.Name
+    $hash = (Get-FileHash (Join-Path $OutputDir $OutputName) -Algorithm SHA256).Hash.ToLower()
+    $hashFile = Join-Path $OutputDir "$outputName.sha256"
+    "$hash  $outputName" | Set-Content $hashFile -Encoding UTF8
+
+    Write-Host "`n=====================================" -ForegroundColor Green
+    Write-Host "MSI: $OutputDir\$outputName" -ForegroundColor Green
+    Write-Host "SHA256: $hash" -ForegroundColor Green
+    Write-Host "=====================================" -ForegroundColor Green
 }
+
