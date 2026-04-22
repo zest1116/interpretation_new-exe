@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+	  <DirectoryRef Id="INSTALLFOLDER">
+		  <Component Id="comp_Updater" Guid="84B5C896-78C6-44E1-AAE5-274946643FE7">
+			  <File Id="file_Updater"
+					Source="$(var.PublishDir)\axink Translator Updater.exe"
+					KeyPath="yes" />
+		  </Component>
+	  </DirectoryRef>
+	  <ComponentGroup Id="UpdaterComponents">
+		  <ComponentRef Id="comp_Updater" />
+	  </ComponentGroup>
+  </Fragment>
+</Wix>

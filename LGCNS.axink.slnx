@@ -17,6 +17,7 @@
     <File Path="Doc/통신API_V0.9.md" />
   </Folder>
   <Folder Name="/Script/">
+    <File Path="Scripts/build-0.9.ps1" />
     <File Path="Scripts/build.ps1" />
     <File Path="Scripts/install.cmd" />
   </Folder>

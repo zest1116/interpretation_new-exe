@@ -10,7 +10,6 @@
 $ErrorActionPreference = "Stop"
 $SolutionDir = Split-Path $PSScriptRoot -Parent
 $PublishDir = (Join-Path $SolutionDir "Publish").TrimEnd('\')
-$UpdaterOutput = (Join-Path $SolutionDir "Publish_Updater").TrimEnd('\')
 $OutputDir = Join-Path $SolutionDir "releases"
 
 if ($Version -notmatch '^\d+\.\d+\.\d+$') {
@@ -31,8 +30,6 @@ $pathsToClean = @(
     "$SolutionDir\Application\LGCNS.axink.App\obj",
     "$SolutionDir\Setup\LGCNS.axink.MSI\bin",
     "$SolutionDir\Setup\LGCNS.axink.MSI\obj",
-    "$SolutionDir\Updater\LGCNS.axink.Updater\bin",
-    "$SolutionDir\Updater\LGCNS.axink.Updater\obj",
     $PublishDir
 )
 
@@ -43,7 +40,7 @@ foreach ($path in $pathsToClean) {
 }
 
 # 1. Publish
-Write-Host "`n[1/4] Publishing WPF App..." -ForegroundColor Yellow
+Write-Host "`n[1/3] Publishing app..." -ForegroundColor Yellow
 
 dotnet publish "$SolutionDir\Application\LGCNS.axink.App\LGCNS.axink.App.csproj" `
     -c Release `
@@ -55,34 +52,6 @@ dotnet publish "$SolutionDir\Application\LGCNS.axink.App\LGCNS.axink.App.csproj"
     -o $PublishDir
 
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-Write-Host "`n[2/4] Publishing Updater..." -ForegroundColor Yellow
-
-dotnet publish "$SolutionDir\Updater\LGCNS.axink.Updater\LGCNS.axink.Updater.csproj" `
-    -c Release `
-    -r win-x64 `
-    --self-contained false `
-    -p:PublishSingleFile=true `
-    -p:Version=$Version `
-    -p:FileVersion=$Version4 `
-    -p:AssemblyVersion=$Version4 `
-    -o $UpdaterOutput
- 
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-# EXE만 메인 PublishDir로 복사
-Copy-Item "$UpdaterOutput\axink Translator Updater.exe" $PublishDir
-Remove-Item $UpdaterOutput -Recurse -Force
-
-# Updater.exe가 PublishDir에 존재하는지 확인
-$updaterExe = Join-Path $PublishDir "axink Translator Updater.exe"
-if (Test-Path $updaterExe) {
-    Write-Host "  Updater OK: $(Split-Path $updaterExe -Leaf)" -ForegroundColor Green
-} else {
-    Write-Error "Updater.exe가 PublishDir에 생성되지 않았습니다."
-    exit 1
-}
-
 
 if ($PublishOnly) {
     Write-Host "`nPublish 완료: $PublishDir" -ForegroundColor Green

@@ -24,6 +24,11 @@ namespace LGCNS.axink.Common
         public const string DIR_NAME_WAVE_ROOT = "Recording";
 
         /// <summary>
+        /// 업데이트 폴더명
+        /// </summary>
+        public const string DIR_NAME_UPDATE = "Updates";
+
+        /// <summary>
         /// UserSettings.json 파일명
         /// </summary>
         public const string FILE_NAME_USER_SETTINGS = "UserSettings.json";

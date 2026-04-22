@@ -8,17 +8,27 @@ namespace LGCNS.axink.Common
     {
         private static bool _initialized;
 
+        public static string LogFolder { get; private set; }
+
         public static void Init(string appName, string companyName)
         {
             if (_initialized) return;
 
-            var logPath = Path.Combine(
+            LogFolder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 companyName,
                 appName,
-                "Logs",
-                "app-.log"
-            );
+                "Logs");
+
+            var logPath = Path.Combine(LogFolder, "app-.log");
+
+            //var logPath = Path.Combine(
+            //    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            //    companyName,
+            //    appName,
+            //    "Logs",
+            //    "app-.log"
+            //);
 
             Log.Logger = new Serilog.LoggerConfiguration()
                 .MinimumLevel.Debug()

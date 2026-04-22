@@ -1,12 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
 namespace LGCNS.axink.Updater
 {
@@ -35,6 +31,21 @@ namespace LGCNS.axink.Updater
 
             MouseLeftButtonDown += (s, e) => DragMove();
             Loaded += async (s, e) => await RunUpdatePipelineAsync();
+        }
+
+        private bool HasEnoughDiskSpace(string downloadFolder, long requiredBytes)
+        {
+            try
+            {
+                var drive = new DriveInfo(Path.GetPathRoot(downloadFolder)!);
+                // 필요 용량의 2배 (다운로드 + 설치 임시 파일)
+                var needed = Math.Max(requiredBytes * 2, 100 * 1024 * 1024); // 최소 100MB
+                return drive.AvailableFreeSpace > needed;
+            }
+            catch
+            {
+                return true; // 확인 불가 시 진행
+            }
         }
 
         // ═══════════════════════════════════════════════════════
@@ -200,30 +211,34 @@ namespace LGCNS.axink.Updater
         {
             var downloadFolder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "LGCNS", "axink Translator", "Updates");
+                Common.Consts.APP_NAME, Common.Consts.DIR_NAME_UPDATE);
             Directory.CreateDirectory(downloadFolder);
 
-            var fileName = $"LGCNS-axink-{_options.Version}.msi";
+            var fileName = $"{Common.Consts.APP_COMPANY}-{Common.Consts.APP_NAME}-{_options.Version}.msi";
             var filePath = Path.Combine(downloadFolder, fileName);
             var tempPath = filePath + ".tmp";
 
             try
             {
+                CleanupOldDownloads(downloadFolder);
+
                 _logger.Log($"Downloading: {_options.DownloadUrl}");
 
                 using var response = await _httpClient.GetAsync(
                     _options.DownloadUrl,
                     HttpCompletionOption.ResponseHeadersRead,
                     token);
-                // 디버그 확인용
-                Debug.WriteLine($"Status: {(int)response.StatusCode} {response.ReasonPhrase}");
-                Debug.WriteLine($"Content-Type: {response.Content.Headers.ContentType}");
-                Debug.WriteLine($"Content-Length: {response.Content.Headers.ContentLength}");
-
 
                 response.EnsureSuccessStatusCode();
 
                 var totalBytes = response.Content.Headers.ContentLength ?? 0;
+
+                // 다운로드 전 호출
+                if (!HasEnoughDiskSpace(downloadFolder, totalBytes))
+                {
+                    ShowError("디스크 공간이 부족합니다.\n불필요한 파일을 삭제한 후 다시 시도해주세요.");
+                    return null;
+                }
 
                 using (var contentStream = await response.Content.ReadAsStreamAsync(token))
                 using (var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
@@ -279,6 +294,30 @@ namespace LGCNS.axink.Updater
                     SizeText.Text = $"{mbDown:F1} MB";
                 }
             });
+        }
+
+        /**
+         * 이전 다운로드 삭제
+         */
+        private void CleanupOldDownloads(string downloadFolder, string? currentFile = null)
+        {
+            try
+            {
+                foreach (var file in Directory.GetFiles(downloadFolder, "*.msi"))
+                {
+                    if (file == currentFile) continue;
+                    try { File.Delete(file); } catch { }
+                }
+                // .tmp 파일도 정리
+                foreach (var file in Directory.GetFiles(downloadFolder, "*.tmp"))
+                {
+                    try { File.Delete(file); } catch { }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Log($"Cleanup warning: {ex.Message}");
+            }
         }
 
         // ═══════════════════════════════════════════════════════

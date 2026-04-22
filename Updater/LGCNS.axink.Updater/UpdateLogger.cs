@@ -13,7 +13,7 @@ namespace LGCNS.axink.Updater
         {
             LogFolder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "LGCNS", "axink Translator", "Logs");
+                Common.Consts.APP_COMPANY, Common.Consts.APP_NAME, "Logs");
 
             Directory.CreateDirectory(LogFolder);
             CurrentLogFile = Path.Combine(LogFolder, $"updater-{DateTime.Now:yyyyMMdd}.log");

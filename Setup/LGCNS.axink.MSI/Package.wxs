@@ -74,6 +74,7 @@
 			<ComponentGroupRef Id="RegistryComponents" />
 			<ComponentGroupRef Id="ShortcutComponents" />
 			<ComponentGroupRef Id="PublishedComponents" />
+			<ComponentGroupRef Id="UpdaterComponents" />
 		</Feature>
 	</Package>
 </Wix>
