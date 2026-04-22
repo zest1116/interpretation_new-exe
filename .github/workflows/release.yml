@@ -6,6 +6,9 @@ on:
   push:
     tags: [ "v*" ]
 
+permissions:
+  contents: write
+
 # 환경 변수
 env:
   DOTNET_VERSION: "8.0.x"
@@ -75,6 +78,7 @@ jobs:
       #  GitHub Release 생성 (선택)
       # ─────────────────────────────────────────
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
@@ -83,3 +87,5 @@ jobs:
             releases/*.msi
             releases/*.sha256
           draft: ${{ env.APP_ENV != 'Production' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
