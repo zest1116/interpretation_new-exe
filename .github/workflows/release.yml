@@ -55,3 +55,18 @@ jobs:
             -Version ${{ steps.ver.outputs.VERSION }} `
             -Environment ${{ env.APP_ENV }} `
             -BuildMsi
+            
+      # ─────────────────────────────────────────
+      #  결과물 확인
+      # ─────────────────────────────────────────
+      - name: Verify outputs
+        id: outputs
+        run: |
+          $msi = Get-ChildItem "releases\*.msi" | Select-Object -First 1
+          $hash = Get-Content "releases\*.sha256" -Raw
+          echo "MSI_NAME=$($msi.Name)" >> $env:GITHUB_OUTPUT
+          echo "MSI_PATH=$($msi.FullName)" >> $env:GITHUB_OUTPUT
+          echo "MSI_SIZE=$($msi.Length)" >> $env:GITHUB_OUTPUT
+          echo "SHA256=$($hash.Split(' ')[0])" >> $env:GITHUB_OUTPUT
+          echo "MSI: $($msi.Name) ($([math]::Round($msi.Length/1MB, 1)) MB)"
+          echo "SHA256: $($hash.Split(' ')[0])"
