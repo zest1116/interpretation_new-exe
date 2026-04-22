@@ -1,0 +1,57 @@
+# .github/workflows/release.yml
+
+name: Build & Release
+
+on:
+  push:
+    tags: ['v*']
+
+# 환경 변수
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    # ── 환경 결정 ──
+    # v0.2.108-dev → Development, v0.2.108-qa → QA, v0.2.108 → Production
+    env:
+      APP_ENV: >-
+        ${{ contains(github.ref_name, '-dev') && 'Development' ||
+            contains(github.ref_name, '-qa') && 'QA' ||
+            'Production' }}
+    steps:
+      # ─────────────────────────────────────────
+      #  준비
+      # ─────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install WiX v4
+        run: dotnet tool install --global wix
+
+      # 태그에서 버전 추출: v0.2.108-dev → 0.2.108
+      - name: Extract version
+        id: ver
+        run: |
+          $raw = "${{ github.ref_name }}"
+          $ver = $raw -replace '^v' -replace '-dev$' -replace '-qa$'
+          echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
+          echo "VERSION4=$ver.0" >> $env:GITHUB_OUTPUT
+          echo "Extracted version: $ver"
+
+      # ─────────────────────────────────────────
+      #  빌드
+      # ─────────────────────────────────────────
+      - name: Build MSI
+        run: |
+          .\Script\build.ps1 `
+            -Version ${{ steps.ver.outputs.VERSION }} `
+            -Environment ${{ env.APP_ENV }} `
+            -BuildMsi
