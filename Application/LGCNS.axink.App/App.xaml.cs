@@ -1,5 +1,4 @@
-﻿using axinkTranslator.Services;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using LGCNS.axink.App.Services;
 using LGCNS.axink.App.Updater;
 using LGCNS.axink.App.ViewModels;
@@ -347,7 +346,6 @@ namespace LGCNS.axink.App
                 // Updater 실행 실패 (파일 없음, UAC 거부 등)
                 // → 실패 기록 + 앱 종료
                 UpdateGuard.RecordFailure(info.VersionName);
-
                 MessageBox.Show(
                     "업데이트를 시작할 수 없습니다.\n" +
                     "관리자에게 문의해주세요.",
