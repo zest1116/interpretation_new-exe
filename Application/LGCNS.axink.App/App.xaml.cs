@@ -7,6 +7,7 @@ using LGCNS.axink.Audio;
 using LGCNS.axink.Audio.Devices;
 using LGCNS.axink.Common;
 using LGCNS.axink.Common.Interfaces;
+using LGCNS.axink.Common.Localization;
 using LGCNS.axink.Common.Monitors;
 using LGCNS.axink.Models.ApiResponse;
 using LGCNS.axink.Models.Devices;
@@ -76,21 +77,18 @@ namespace LGCNS.axink.App
             var supported = new[] { "ko", "en", "zh" };
             if (!supported.Contains(lang)) lang = "en";
 
-            var dict = new ResourceDictionary
-            {
-                Source = new Uri($"Resources/Strings.{lang}.xaml", UriKind.Relative)
-            };
-            Resources.MergedDictionaries.Add(dict);
+            LocalizationManager.Instance.SetLanguage(lang);
 
             // ━━ STEP 0: 업데이트 결과 처리 (Updater.exe가 넘긴 인자) ━━
             bool skipUpdate = false;
+
             if (e.Args.Contains("--update-failed"))
             {
                 var failedVersion = GetArgValue(e.Args, "--failed-version");
                 UpdateGuard.RecordFailure(failedVersion);
+                skipUpdate = true; // 이번 세션은 무조건 스킵
 
                 Logging.Warn($"업데이트 실패로 기존 버전 실행 (version={failedVersion})");
-                skipUpdate = true; // 이번 세션은 무조건 스킵
             }
             else if (e.Args.Contains("--update-success"))
             {
@@ -220,43 +218,52 @@ namespace LGCNS.axink.App
 
             var messenger = _serviceProvider.GetRequiredService<IMessenger>();
 
-            //업데이트 체크
+            // ━━ 업데이트 체크 ━━
+            // 서버 체크는 항상 실행 (새 버전 감지를 위해)
+            // 실제 업데이트 실행만 Guard로 제어
             var appInfoUrl = appSettingsMon.Current.AppInfoUrl;
 
-            if (!string.IsNullOrEmpty(appInfoUrl) && !skipUpdate && UpdateGuard.ShouldAttemptUpdate())
+            if (!string.IsNullOrEmpty(appInfoUrl) && !skipUpdate)
             {
                 _updateService = new UpdateService(appInfoUrl);
-
                 var status = await _updateService.CheckForUpdateAsync();
 
-                // 새 버전이면 이전 실패 기록 리셋
+                // 새 버전이면 이전 실패 카운터 자동 리셋
                 if (_updateService.LatestUpdate != null)
                     UpdateGuard.ResetIfNewVersion(_updateService.LatestUpdate.VersionName);
 
                 switch (status)
                 {
                     case UpdateStatus.MandatoryUpdateRequired:
-                        // Guard 재확인 (ResetIfNewVersion 후에도 차단이면 스킵)
                         if (UpdateGuard.ShouldAttemptUpdate())
                         {
                             HandleMandatoryUpdate();
-                            return; // Updater 실행 → 앱 종료됨
+                            return;
                         }
                         else
                         {
-                            Logging.Warn("[App] 필수 업데이트지만 Guard가 차단, 기존 버전으로 실행");
+                            // 3회 연속 실패 → 사용자에게 수동 재시도 선택권 제공
+                            Logging.Warn($"[App] 필수 업데이트 {UpdateGuard.GetFailCount()}회 연속 실패, 수동 재시도 안내");
+                            HandleMandatoryUpdateBlocked();
                         }
                         break;
 
                     case UpdateStatus.OptionalUpdateAvailable:
-                        // MainWindow 띄운 후 토스트로 알림 (아래에서 처리)
+                        if (!UpdateGuard.ShouldAttemptUpdate())
+                        {
+                            Logging.Info("[App] 선택 업데이트 있으나 Guard 차단, 알림만 표시");
+                        }
+                        // MainWindow에서 토스트 알림 처리
                         break;
 
                     case UpdateStatus.Error:
-                        // 서버 연결 실패 → 무시하고 정상 진행
                         Debug.WriteLine("[App] Update check failed, continuing normally");
                         break;
                 }
+            }
+            else if (skipUpdate)
+            {
+                Logging.Info("[App] 업데이트 스킵 (--update-failed 세션)");
             }
 
 
@@ -354,6 +361,33 @@ namespace LGCNS.axink.App
                     MessageBoxImage.Warning);
                 Shutdown();
             }
+        }
+
+        // ─────────────────────────────────────────────────────
+        //  강제 업데이트 Guard 차단 시 — 수동 재시도 안내
+        // ─────────────────────────────────────────────────────
+        private void HandleMandatoryUpdateBlocked()
+        {
+            var info = _updateService!.LatestUpdate!;
+            var failCount = UpdateGuard.GetFailCount();
+            var msg = LocalizationManager.GetString(
+                LangKeys.Msg_Update_MandatoryRetryPrompt,
+                info.VersionName,  // {0}
+                failCount           // {1}
+            );
+            var result = MessageBox.Show(
+                msg,
+                Consts.APP_NAME,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                // 사용자가 수동 재시도 → 카운터 리셋 후 업데이트 진행
+                UpdateGuard.ResetFailCount();
+                HandleMandatoryUpdate();
+            }
+            // No → 앱 정상 실행으로 진행
         }
 
         private async Task<TenantInfo?> CheckCompany(string tenantListUrl, string companyCode)

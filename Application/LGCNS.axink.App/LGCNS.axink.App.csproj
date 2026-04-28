@@ -12,6 +12,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Resources\**" />
+	  <EmbeddedResource Remove="Resources\**" />
+	  <None Remove="Resources\**" />
+	  <Page Remove="Resources\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Remove="Controls\NotificationItem.xaml.cs" />
 	</ItemGroup>
 
@@ -34,6 +41,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\LGCNS.axink.App.Services\LGCNS.axink.App.Services.csproj" />
 		<ProjectReference Include="..\LGCNS.axink.Audio\LGCNS.axink.Audio.csproj" />
+		<ProjectReference Include="..\LGCNS.axink.Common.Localization\LGCNS.axink.Common.Localization.csproj" />
 		<ProjectReference Include="..\LGCNS.axink.Common\LGCNS.axink.Common.csproj" />
 		<ProjectReference Include="..\LGCNS.axink.Models\LGCNS.axink.Models.csproj" />
 		<ProjectReference Include="..\LGCNS.axink.WebHosting\LGCNS.axink.WebHosting.csproj" />
@@ -56,18 +64,6 @@
 		<None Update="appsettings.Production.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Page Update="Resources\String.en.xaml">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Page>
-	  <Page Update="Resources\String.zh.xaml">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Page>
-	  <Page Update="Resources\Strings.ko.xaml">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Page>
 	</ItemGroup>
 	
 </Project>

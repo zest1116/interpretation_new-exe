@@ -53,4 +53,5 @@
     <sys:String x:Key="Msg_Update_Log">Log</sys:String>
     <sys:String x:Key="Msg_Update_AlreadyInProgress">An update is already in progress.</sys:String>
     <sys:String x:Key="Msg_Update_CannotRunDirectly">This program runs during a:xink Translator auto-update.&#x0a;It cannot be run directly.</sys:String>
+    <sys:String x:Key="Msg_Update_MandatoryRetryPrompt">Mandatory update (v{0}) has failed {1} time(s) in a row.&#x0a;&#x0a;Please check your network or disk status.&#x0a;Click "Yes" to retry.&#x0a;Click "No" to run the existing version.</sys:String>
 </ResourceDictionary>

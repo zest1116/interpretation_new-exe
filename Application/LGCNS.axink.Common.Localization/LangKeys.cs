@@ -58,6 +58,7 @@ namespace LGCNS.axink.Common.Localization
         public const string Msg_Update_Log = nameof(Msg_Update_Log);
         public const string Msg_Update_AlreadyInProgress = nameof(Msg_Update_AlreadyInProgress);
         public const string Msg_Update_CannotRunDirectly = nameof(Msg_Update_CannotRunDirectly);
+        public const string Msg_Update_MandatoryRetryPrompt = nameof(Msg_Update_MandatoryRetryPrompt);
     }
 
 }
