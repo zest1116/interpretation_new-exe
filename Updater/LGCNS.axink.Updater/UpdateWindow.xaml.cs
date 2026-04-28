@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using LGCNS.axink.Common.Localization;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -58,7 +59,7 @@ namespace LGCNS.axink.Updater
             try
             {
                 // ── 1. WPF 앱 프로세스 종료 대기 ──
-                SetPhase("앱 종료를 기다리고 있습니다...", isIndeterminate: true);
+                SetPhase(LocalizationManager.GetString(LangKeys.Msg_Update_WaitingForExit), isIndeterminate: true);
                 _logger.Log($"Waiting for process {_options.Pid} to exit...");
 
                 await WaitForProcessExitAsync(_options.Pid, _cts.Token);
@@ -69,24 +70,24 @@ namespace LGCNS.axink.Updater
 
                 if (_options.NeedsDownload)
                 {
-                    SetPhase("업데이트 다운로드 중...", isIndeterminate: false);
-                    TitleText.Text = "업데이트 다운로드 중";
+                    SetPhase(LocalizationManager.GetString(LangKeys.Msg_Update_Downloading), isIndeterminate: false);
+                    TitleText.Text = LocalizationManager.GetString(LangKeys.Msg_Update_Downloading);
 
                     msiPath = await DownloadMsiAsync(_cts.Token);
 
                     if (string.IsNullOrEmpty(msiPath))
                     {
-                        ShowError("다운로드에 실패했습니다.");
+                        ShowError(LocalizationManager.GetString(LangKeys.Msg_Update_DownloadFailed));
                         return;
                     }
 
                     // ── 3. 해시 검증 ──
                     if (!string.IsNullOrEmpty(_options.FileHash))
                     {
-                        SetPhase("파일 검증 중...", isIndeterminate: true);
+                        SetPhase(LocalizationManager.GetString(LangKeys.Msg_Update_Verifying), isIndeterminate: true);
                         if (!await VerifyFileHashAsync(msiPath, _options.FileHash))
                         {
-                            ShowError("다운로드된 파일이 손상되었습니다.");
+                            ShowError(LocalizationManager.GetString(LangKeys.Msg_Update_FileCorrupted));
                             TryDeleteFile(msiPath);
                             return;
                         }
@@ -97,21 +98,21 @@ namespace LGCNS.axink.Updater
                 // ── 4. MSI 설치 ──
                 if (string.IsNullOrEmpty(msiPath) || !File.Exists(msiPath))
                 {
-                    ShowError("설치 파일을 찾을 수 없습니다.");
+                    ShowError(LocalizationManager.GetString(LangKeys.Msg_Update_FileNotFound));
                     return;
                 }
 
-                SetPhase("업데이트를 설치하고 있습니다...", isIndeterminate: true);
-                TitleText.Text = "업데이트 설치 중";
-                DetailText.Text = "잠시만 기다려 주세요...";
+                SetPhase(LocalizationManager.GetString(LangKeys.Msg_Update_Installing), isIndeterminate: true);
+                TitleText.Text = LocalizationManager.GetString(LangKeys.Msg_Update_InstallingTitle);
+                DetailText.Text = LocalizationManager.GetString(LangKeys.Msg_Update_PleaseWait);
 
                 var installResult = await RunMsiInstallAsync(msiPath);
 
                 if (installResult != 0)
                 {
                     _logger.Log($"MSI install failed with exit code {installResult}");
-                    ShowError($"설치에 실패했습니다. (코드: {installResult})");
-                    LaunchApp(); // 실패해도 기존 버전으로 재시작
+                    ShowError($"{LocalizationManager.GetString(LangKeys.Msg_Update_InstallFailed)} (Code: {installResult})");
+                    LaunchApp("--update-failed"); // ← 실패 인자 전달
                     return;
                 }
 
@@ -122,24 +123,24 @@ namespace LGCNS.axink.Updater
                     TryDeleteFile(msiPath);
 
                 // ── 6. 앱 재시작 ──
-                SetPhase("업데이트 완료! 앱을 다시 시작합니다...", isIndeterminate: true);
-                TitleText.Text = "업데이트 완료";
+                SetPhase($"{LocalizationManager.GetString(LangKeys.Msg_Update_Complete)}! {LocalizationManager.GetString(LangKeys.Msg_Update_Restarting)}", isIndeterminate: true);
+                TitleText.Text = LocalizationManager.GetString(LangKeys.Msg_Update_Complete);
                 DetailText.Text = "";
 
                 await Task.Delay(1500); // 완료 메시지 잠깐 보여주기
-                LaunchApp();
+                LaunchApp("--update-success"); // ← 성공 인자 전달
                 Application.Current.Shutdown();
             }
             catch (OperationCanceledException)
             {
                 _logger.Log("Update cancelled");
-                ShowError("업데이트가 취소되었습니다.");
+                ShowError(LocalizationManager.GetString(LangKeys.Msg_Update_Cancelled));
             }
             catch (Exception ex)
             {
                 _logger.Log($"FATAL: {ex}");
-                ShowError($"예기치 않은 오류가 발생했습니다.\n{ex.Message}");
-                LaunchApp(); // 오류 시에도 기존 버전으로 재시작
+                ShowError($"{LocalizationManager.GetString(LangKeys.Msg_Update_UnexpectedError)}.\n{ex.Message}");
+                LaunchApp("--update-failed"); // ← 오류 시에도 실패 인자 전달
             }
         }
 
@@ -236,7 +237,7 @@ namespace LGCNS.axink.Updater
                 // 다운로드 전 호출
                 if (!HasEnoughDiskSpace(downloadFolder, totalBytes))
                 {
-                    ShowError("디스크 공간이 부족합니다.\n불필요한 파일을 삭제한 후 다시 시도해주세요.");
+                    ShowError($"{LocalizationManager.GetString(LangKeys.Msg_Update_DiskSpaceLow)}\n{LocalizationManager.GetString(LangKeys.Msg_Update_DiskSpaceRetry)}");
                     return null;
                 }
 
@@ -416,7 +417,7 @@ namespace LGCNS.axink.Updater
         // ═══════════════════════════════════════════════════════
         //  5. 앱 재시작
         // ═══════════════════════════════════════════════════════
-        private void LaunchApp()
+        private void LaunchApp(string resultArg = "")
         {
             if (string.IsNullOrEmpty(_options.AppPath) || !File.Exists(_options.AppPath))
             {
@@ -424,11 +425,20 @@ namespace LGCNS.axink.Updater
                 return;
             }
 
-            _logger.Log($"Launching: {_options.AppPath}");
+            var args = resultArg;
+
+            // 실패 시 실패한 버전도 전달
+            if (resultArg == "--update-failed" && !string.IsNullOrEmpty(_options.Version))
+            {
+                args += $" --failed-version {_options.Version}";
+            }
+
+            _logger.Log($"Launching: {_options.AppPath} {args}");
 
             Process.Start(new ProcessStartInfo
             {
                 FileName = _options.AppPath,
+                Arguments = args,
                 UseShellExecute = true,
                 WorkingDirectory = Path.GetDirectoryName(_options.AppPath) ?? "."
             });
@@ -456,9 +466,9 @@ namespace LGCNS.axink.Updater
         {
             Dispatcher.Invoke(() =>
             {
-                TitleText.Text = "업데이트 실패";
+                TitleText.Text = LocalizationManager.GetString(LangKeys.Msg_Update_Failed);
                 StatusText.Text = message;
-                DetailText.Text = $"로그: {_logger.CurrentLogFile}";
+                DetailText.Text = $"{LocalizationManager.GetString(LangKeys.Msg_Update_Log)}: {_logger.CurrentLogFile}";
                 MainProgress.IsIndeterminate = false;
                 MainProgress.Value = 0;
                 PercentText.Text = "";
@@ -475,7 +485,7 @@ namespace LGCNS.axink.Updater
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            LaunchApp(); // 기존 버전으로 재시작
+            LaunchApp("--update-failed"); // ← 닫기도 실패로 처리
             Application.Current.Shutdown();
         }
 

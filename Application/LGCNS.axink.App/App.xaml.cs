@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using axinkTranslator.Services;
+using CommunityToolkit.Mvvm.Messaging;
 using LGCNS.axink.App.Services;
 using LGCNS.axink.App.Updater;
 using LGCNS.axink.App.ViewModels;
@@ -81,6 +82,23 @@ namespace LGCNS.axink.App
                 Source = new Uri($"Resources/Strings.{lang}.xaml", UriKind.Relative)
             };
             Resources.MergedDictionaries.Add(dict);
+
+            // ━━ STEP 0: 업데이트 결과 처리 (Updater.exe가 넘긴 인자) ━━
+            bool skipUpdate = false;
+            if (e.Args.Contains("--update-failed"))
+            {
+                var failedVersion = GetArgValue(e.Args, "--failed-version");
+                UpdateGuard.RecordFailure(failedVersion);
+
+                Logging.Warn($"업데이트 실패로 기존 버전 실행 (version={failedVersion})");
+                skipUpdate = true; // 이번 세션은 무조건 스킵
+            }
+            else if (e.Args.Contains("--update-success"))
+            {
+                UpdateGuard.ResetFailCount();
+                Logging.Info("업데이트 성공, 카운터 리셋");
+            }
+
 
             //회사코드
             CompanyCode = RegistryUtils.ReadCompanyCode();
@@ -203,20 +221,33 @@ namespace LGCNS.axink.App
 
             var messenger = _serviceProvider.GetRequiredService<IMessenger>();
 
-
+            //업데이트 체크
             var appInfoUrl = appSettingsMon.Current.AppInfoUrl;
 
-            if (!string.IsNullOrEmpty(appInfoUrl))
+            if (!string.IsNullOrEmpty(appInfoUrl) && !skipUpdate && UpdateGuard.ShouldAttemptUpdate())
             {
                 _updateService = new UpdateService(appInfoUrl);
 
                 var status = await _updateService.CheckForUpdateAsync();
 
+                // 새 버전이면 이전 실패 기록 리셋
+                if (_updateService.LatestUpdate != null)
+                    UpdateGuard.ResetIfNewVersion(_updateService.LatestUpdate.VersionName);
+
                 switch (status)
                 {
                     case UpdateStatus.MandatoryUpdateRequired:
-                        HandleMandatoryUpdate();
-                        return; // Updater 실행 → 앱 종료됨
+                        // Guard 재확인 (ResetIfNewVersion 후에도 차단이면 스킵)
+                        if (UpdateGuard.ShouldAttemptUpdate())
+                        {
+                            HandleMandatoryUpdate();
+                            return; // Updater 실행 → 앱 종료됨
+                        }
+                        else
+                        {
+                            Logging.Warn("[App] 필수 업데이트지만 Guard가 차단, 기존 버전으로 실행");
+                        }
+                        break;
 
                     case UpdateStatus.OptionalUpdateAvailable:
                         // MainWindow 띄운 후 토스트로 알림 (아래에서 처리)
@@ -284,6 +315,15 @@ namespace LGCNS.axink.App
             };
         }
 
+        /// <summary>
+        /// 커맨드라인에서 --key value 형태의 값을 추출
+        /// </summary>
+        private static string? GetArgValue(string[] args, string key)
+        {
+            var index = Array.IndexOf(args, key);
+            return index >= 0 && index + 1 < args.Length ? args[index + 1] : null;
+        }
+
         // ─────────────────────────────────────────────────────
         //  강제 업데이트 처리
         // ─────────────────────────────────────────────────────
@@ -291,21 +331,23 @@ namespace LGCNS.axink.App
         {
             var info = _updateService!.LatestUpdate!;
 
-            MessageBox.Show(
-                $"필수 업데이트가 있습니다.\n\n" +
-                $"최신 버전: v{info.VersionName}\n" +
-                (string.IsNullOrEmpty(info.Changes)
-                    ? ""
-                    : $"\n{info.Changes}\n") +
-                "\n확인을 누르면 업데이트가 시작됩니다.",
-                "axink 업데이트",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            //MessageBox.Show(
+            //    $"필수 업데이트가 있습니다.\n\n" +
+            //    $"최신 버전: v{info.VersionName}\n" +
+            //    (string.IsNullOrEmpty(info.Changes)
+            //        ? ""
+            //        : $"\n{info.Changes}\n") +
+            //    "\n확인을 누르면 업데이트가 시작됩니다.",
+            //    "axink 업데이트",
+            //    MessageBoxButton.OK,
+            //    MessageBoxImage.Information);
 
             if (!_updateService.LaunchUpdaterAndExit())
             {
                 // Updater 실행 실패 (파일 없음, UAC 거부 등)
-                // → 앱을 종료하지 않고 에러 안내
+                // → 실패 기록 + 앱 종료
+                UpdateGuard.RecordFailure(info.VersionName);
+
                 MessageBox.Show(
                     "업데이트를 시작할 수 없습니다.\n" +
                     "관리자에게 문의해주세요.",

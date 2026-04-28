@@ -99,7 +99,7 @@
             <StackPanel Grid.Row="10" Orientation="Horizontal"
                         HorizontalAlignment="Right" Visibility="Collapsed"
                         x:Name="ButtonPanel">
-                <Button x:Name="RetryButton" Content="재시도"
+                <Button x:Name="RetryButton" Content="{DynamicResource Dic_Common_Retry}"
                         Width="80" Height="32" Margin="0,0,8,0"
                         FontSize="13" Cursor="Hand"
                         Click="RetryButton_Click">
@@ -122,7 +122,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button x:Name="CloseButton" Content="닫기"
+                <Button x:Name="CloseButton" Content="{DynamicResource Dic_Common_Close}"
                         Width="80" Height="32"
                         FontSize="13" Cursor="Hand"
                         Click="CloseButton_Click">

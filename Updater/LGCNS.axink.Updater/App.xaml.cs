@@ -1,5 +1,8 @@
-﻿using System.Configuration;
+﻿using LGCNS.axink.Common;
+using LGCNS.axink.Common.Localization;
+using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Windows;
 
 namespace LGCNS.axink.Updater
@@ -17,14 +20,22 @@ namespace LGCNS.axink.Updater
         {
             base.OnStartup(e);
 
+            //언어설정
+            string lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            // 지원 언어가 아니면 기본값
+            var supported = new[] { "ko", "en", "zh" };
+            if (!supported.Contains(lang)) lang = "en";
+
+            LocalizationManager.Instance.SetLanguage(lang);
+
             // ── 단일 인스턴스 보장 ──
             _mutex = new Mutex(true, MutexName, out bool createdNew);
 
             if (!createdNew)
             {
                 MessageBox.Show(
-                    "업데이트가 이미 진행 중입니다.",
-                    "axink Updater",
+                    (string)Application.Current.FindResource(LangKeys.Msg_Update_AlreadyInProgress),
+                    Consts.APP_NAME,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
                 Shutdown();
@@ -37,8 +48,8 @@ namespace LGCNS.axink.Updater
             if (options == null)
             {
                 MessageBox.Show(
-                    "이 프로그램은 axink 자동 업데이트 시 실행됩니다.\n직접 실행할 수 없습니다.",
-                    "axink Updater",
+                    (string)Application.Current.FindResource(LangKeys.Msg_Update_CannotRunDirectly),
+                    Consts.APP_NAME,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
                 Shutdown();

@@ -9,7 +9,7 @@ namespace LGCNS.axink.Common
 {
     public class RegistryUtils
     {
-        private const string RegistryPath = @$"Software\{Consts.APP_COMPANY}\{Consts.APP_NAME}";
+        public const string RegistryPath = @$"Software\{Consts.APP_COMPANY}\{Consts.APP_NAME}";
         private const string RegistryKeyCompanyCode = "CompanyCode";
         private const string ReigstryKeyVersion = "Version";
 

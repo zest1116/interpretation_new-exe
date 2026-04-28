@@ -17,6 +17,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Application\LGCNS.axink.Common.Localization\LGCNS.axink.Common.Localization.csproj" />
 	  <ProjectReference Include="..\..\Application\LGCNS.axink.Common\LGCNS.axink.Common.csproj" />
 	</ItemGroup>
 
