@@ -47,7 +47,8 @@ namespace LGCNS.axink.App.Updater
             {
                 var currentVersion = RegistryUtils.ReadVersion();
                 var companyCode = RegistryUtils.ReadCompanyCode();
-
+                //MSI는 회사별도 동일하게 운영되므로 LGCNS로 고정(향후 회사별로 변경되면 이부분 제거)
+                companyCode = "GIM006"; 
                 var url = string.Format(_updateCheckUrl, companyCode, "MSI");
                 var updateInfo = await ApiClient.GetAsync<UpdateInfo>(url);
 

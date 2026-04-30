@@ -469,6 +469,7 @@ namespace LGCNS.axink.App
         private void WebView_CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             WebView.CoreWebView2.Settings.UserAgent = "wpf-axink";
+            WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;  // ← 여기로 이동
         }
 
         private void NavigateIfPossible(string? url)
@@ -481,7 +482,7 @@ namespace LGCNS.axink.App
                 return;
 
             WebView.Source = uri;
-            WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+            //WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
         }
 
         private void MainWindow_SourceInitialized(object? sender, EventArgs e)
