@@ -12,11 +12,11 @@
 
     <Border CornerRadius="12"
             Background="#FFFFFF"
-            BorderBrush="#E0E0E0"
+            BorderBrush="#E8DBF0"
             BorderThickness="1"
             Padding="36,28">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="24" ShadowDepth="3" Opacity="0.15" Color="#000000"/>
+            <DropShadowEffect BlurRadius="24" ShadowDepth="3" Opacity="0.18" Color="#6B2FA0"/>
         </Border.Effect>
 
         <Grid>
@@ -42,18 +42,24 @@
 
             <!-- 제목 영역 -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-                <!-- 앱 아이콘 영역 (원형 배경) -->
-                <Border Width="36" Height="36" CornerRadius="18" Background="#F0EDFF" Margin="0,0,12,0">
-                    <TextBlock Text="⟳" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"
-                               Foreground="#6B5CE7" FontWeight="Bold"/>
+                <!-- 앱 아이콘 영역 (원형 클리핑) -->
+                <Border Width="40" Height="40" CornerRadius="20" Margin="0,0,12,0"
+                        Background="Transparent">
+                    <Border.Clip>
+                        <EllipseGeometry Center="20,20" RadiusX="25" RadiusY="25"/>
+                    </Border.Clip>
+                    <Image Source="/Assets/LGCNS.axink.png"
+                           Width="40" Height="40"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           Stretch="UniformToFill"/>
                 </Border>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock x:Name="TitleText"
                                Text="업데이트 준비 중..."
-                               FontSize="17" FontWeight="SemiBold" Foreground="#1A1A2E"/>
+                               FontSize="17" FontWeight="SemiBold" Foreground="#2D1B4E"/>
                     <TextBlock x:Name="VersionText"
                                Text=""
-                               FontSize="12" Foreground="#8E8EA0" Margin="0,2,0,0"/>
+                               FontSize="12" Foreground="#9B8AA8" Margin="0,2,0,0"/>
                 </StackPanel>
             </StackPanel>
 
@@ -61,23 +67,24 @@
             <TextBlock Grid.Row="2"
                        x:Name="StatusText"
                        Text="앱 종료를 기다리고 있습니다..."
-                       FontSize="13" Foreground="#4A4A5A"/>
+                       FontSize="13" Foreground="#5A4A6A"/>
 
             <!-- 상세 정보 (다운로드 크기 등) -->
             <TextBlock Grid.Row="4"
                        x:Name="DetailText"
                        Text=""
-                       FontSize="12" Foreground="#8E8EA0"/>
+                       FontSize="12" Foreground="#9B8AA8"/>
 
             <!-- 프로그레스 바 -->
             <Grid Grid.Row="6">
                 <ProgressBar x:Name="MainProgress"
                              Height="6" Minimum="0" Maximum="100" Value="0"
-                             Background="#F0F0F5">
+                             Background="#F0E8F5">
                     <ProgressBar.Foreground>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                            <GradientStop Color="#6B5CE7" Offset="0"/>
-                            <GradientStop Color="#8B7CF7" Offset="1"/>
+                            <GradientStop Color="#7B2D8E" Offset="0"/>
+                            <GradientStop Color="#C94B8A" Offset="0.6"/>
+                            <GradientStop Color="#D64292" Offset="1"/>
                         </LinearGradientBrush>
                     </ProgressBar.Foreground>
                 </ProgressBar>
@@ -87,11 +94,11 @@
             <Grid Grid.Row="8">
                 <TextBlock x:Name="PercentText"
                            Text=""
-                           FontSize="12" Foreground="#8E8EA0"
+                           FontSize="12" Foreground="#9B8AA8"
                            HorizontalAlignment="Left"/>
                 <TextBlock x:Name="SizeText"
                            Text=""
-                           FontSize="12" Foreground="#8E8EA0"
+                           FontSize="12" Foreground="#9B8AA8"
                            HorizontalAlignment="Right"/>
             </Grid>
 
@@ -105,7 +112,14 @@
                         Click="RetryButton_Click">
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="Background" Value="#6B5CE7"/>
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#7B2D8E" Offset="0"/>
+                                        <GradientStop Color="#C94B8A" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
                             <Setter Property="Foreground" Value="White"/>
                             <Setter Property="BorderThickness" Value="0"/>
                             <Setter Property="Template">
@@ -128,8 +142,8 @@
                         Click="CloseButton_Click">
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="Background" Value="#F0F0F5"/>
-                            <Setter Property="Foreground" Value="#4A4A5A"/>
+                            <Setter Property="Background" Value="#F0E8F5"/>
+                            <Setter Property="Foreground" Value="#5A4A6A"/>
                             <Setter Property="BorderThickness" Value="0"/>
                             <Setter Property="Template">
                                 <Setter.Value>
