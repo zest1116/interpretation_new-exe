@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US" xmlns="http://wixtoolset.org/schemas/v4/wxl" Codepage="1252">
+	<String Id="LanguageCode" Value="1033" Overridable="yes" />
+	<String Id="Codepage" Value="1252" Overridable="yes" />
+	<String Id="SummaryDescription" Value="a:xink Translator Installer" />
+	<String Id="DowngradeError" Value="A newer version is already installed." />
+	<String Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch a:xink Translator" />
+	<String Id="WixUILicenseRtf" Value="License.en-US.rtf" Overridable="yes" />
+	<String Id="ShortcutDescriptionRun" Value="Launch a:xink Translator" />
+	<String Id="ShortcutNameUninstall" Value="Uninstall axink Translator" />
+	<String Id="ShortcutDescriptionUninstall" Value="Uninstall a:xink Translator" />
+</WixLocalization>

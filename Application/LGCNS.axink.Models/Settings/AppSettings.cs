@@ -11,6 +11,8 @@ namespace LGCNS.axink.Models.Settings
     {
         public string? SavedAudioFileRoot { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
+        public bool ShowMenubar { get; set; } = true;
+
         public string? TenantListUrl { get; set; }
 
         public string? AppInfoUrl { get; set; }

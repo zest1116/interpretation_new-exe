@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="zh-CN" xmlns="http://wixtoolset.org/schemas/v4/wxl" Codepage="936">
+	<String Id="LanguageCode" Value="2052" Overridable="yes" />
+	<String Id="Codepage" Value="936" Overridable="yes" />
+	<String Id="SummaryDescription" Value="a:xink Translator 安装程序" />
+	<String Id="DowngradeError" Value="已安装更新版本。" />
+	<String Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="启动 a:xink Translator" />
+	<String Id="WixUILicenseRtf" Value="License.zh-CN.rtf" Overridable="yes" />
+	<String Id="ShortcutDescriptionRun" Value="启动 a:xink Translator" />
+	<String Id="ShortcutNameUninstall" Value="卸载 axink Translator" />
+	<String Id="ShortcutDescriptionUninstall" Value="卸载 a:xink Translator" />
+</WixLocalization>

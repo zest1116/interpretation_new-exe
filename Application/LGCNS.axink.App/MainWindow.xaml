@@ -44,7 +44,7 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="32"/>
-                    <RowDefinition Height="32"/>
+                    <RowDefinition x:Name="MenuRow" Height="0"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -158,9 +158,11 @@
                 </Border>
 
                 <!-- Menu Bar -->
-                <Border Grid.Row="1"
+                <Border x:Name="MenuBarBorder"
+                        Grid.Row="1"
                         Background="{DynamicResource MenuBarBackgroundBrush}"
-                        Padding="4,0,0,0">
+                        Padding="4,0,0,0"
+                        Visibility="Collapsed">
                     <Menu Style="{DynamicResource MenuBarStyle}"
                           VerticalAlignment="Center">
                         <MenuItem Header="{DynamicResource Dic_Menu_File}" Style="{DynamicResource MenuItemTopLevelStyle}">

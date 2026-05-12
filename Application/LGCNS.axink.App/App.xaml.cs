@@ -102,12 +102,12 @@ namespace LGCNS.axink.App
 
             // 1. 환경별 기본값 로드 (appsettings.json)
             var defaultAppSettings = AppConfigLoader.LoadSection<AppSettings>("AppSettings");
-
+            Logging.Info($"[Diag] AppConfigLoader → ShowMenuBar = {defaultAppSettings?.ShowMenubar}");
             //로깅 초기화
             Logging.Init(Consts.APP_NAME, Consts.APP_COMPANY);
 
             //앱 시작
-            Logging.Info($"앱 시작 - Version: {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
+            Logging.Info($"앱시작 - Version: {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
             Logging.Info($"환경: {Environment.GetEnvironmentVariable("AXINK_ENVIRONMENT") ?? "Production"}");
 
             var sc = new ServiceCollection();
@@ -122,9 +122,12 @@ namespace LGCNS.axink.App
             sc.AddSingleton(sp =>
             {
                 var store = new JsonFileStore<AppSettings>(Consts.APP_NAME, Consts.FILE_NAME_APP_SETTINGS);
-                store.LoadOrCreate(defaultAppSettings);  // 최초 1회만 파일 생성
+                var current = store.LoadOrCreate(defaultAppSettings);  // 최초 1회만 파일 생성
+                Logging.Info($"[Diag] AddSingleton → ShowMenuBar = {current.ShowMenubar}");
+
                 return store;
             });
+           
             sc.AddSingleton(sp => new JsonFileStore<UserSettings>(Consts.APP_NAME, Consts.FILE_NAME_USER_SETTINGS));
             sc.AddSingleton(sp => new JsonFileStore<SystemSettings>(Consts.APP_NAME, Consts.FILE_NAME_SYS_SETTINGS));
 
@@ -149,6 +152,7 @@ namespace LGCNS.axink.App
             var systemSettingsMon = _serviceProvider.GetRequiredService<ISettingsMonitor<SystemSettings>>();
             //AppSettings 읽기
             var appSettingsMon = _serviceProvider.GetRequiredService<ISettingsMonitor<AppSettings>>();
+            Logging.Info($"[Diag] appSettingsMon.Current.ShowMenuBar = {appSettingsMon.Current.ShowMenubar}");
             //UserSettings 읽기
             var userSettingsMon = _serviceProvider.GetRequiredService<ISettingsMonitor<UserSettings>>();
             //EvenBus

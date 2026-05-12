@@ -137,6 +137,8 @@ namespace LGCNS.axink.App
             Closing += MainWindow_Closing;
             StateChanged += MainWindow_StateChanged;
 
+            ApplyToolbarVisibility();
+
             // 창 위치가 바뀔 때
             this.LocationChanged += (s, e) => NotificationHelper.RearrangeNotifications(this);
 
@@ -165,7 +167,7 @@ namespace LGCNS.axink.App
 
                 if (type == "showDeviceWindow")
                 {
-                    var win = new DeviceControllerWindow(_deviceService, _deviceChangeHub, this);
+                    var win = new DeviceControllerWindow(_deviceService, _deviceChangeHub, _sysSettings, this);
                     win.ShowDialog();
                 }
                 else if (type == "initCompany")
@@ -374,6 +376,7 @@ namespace LGCNS.axink.App
                     }
                 }
 
+                
                 UpdateVisualState();
 
             }
@@ -383,6 +386,13 @@ namespace LGCNS.axink.App
             }
         }
 
+        private void ApplyToolbarVisibility()
+        {
+            bool show = _appSettings.Current.ShowMenubar;
+            Logging.Info($"[Diag] ApplyToolbarVisibility → ShowMenuBar = {show}");
+            MenuBarBorder.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            MenuRow.Height = show ? new GridLength(32) : new GridLength(0);
+        }
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             var settings = _sysSettings.Current;
@@ -695,7 +705,7 @@ namespace LGCNS.axink.App
 
         private void AuditoDevice_Click(object sender, RoutedEventArgs e)
         {
-            var win = new Windows.DeviceControllerWindow(_deviceService, _deviceChangeHub, this);
+            var win = new Windows.DeviceControllerWindow(_deviceService, _deviceChangeHub, _sysSettings, this);
             win.ShowDialog();
         }
 

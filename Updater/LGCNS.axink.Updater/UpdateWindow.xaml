@@ -10,7 +10,7 @@
         Background="Transparent"
         Topmost="True">
 
-    <Border CornerRadius="12"
+    <Border CornerRadius="0"
             Background="#FFFFFF"
             BorderBrush="#E8DBF0"
             BorderThickness="1"

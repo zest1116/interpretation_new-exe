@@ -3,6 +3,8 @@
     [string]$Version,
     [ValidateSet("Development","QA","Production")]
     [string]$Environment = "Production",
+    [ValidateSet("ko-KR","en-US","zh-CN")]
+    [string]$Culture = "",     # 기본값 빈 문자열
     [switch]$PublishOnly,
     [switch]$BuildMsi
 )
@@ -124,26 +126,45 @@ if ($PublishOnly) {
 if ($BuildMsi) {
     Write-Host "`n[4/4] Building MSI..." -ForegroundColor Yellow
     
-    dotnet build "$SolutionDir\Setup\LGCNS.axink.MSI\LGCNS.axink.MSI.wixproj" `
-        -c Release `
-        -p:Platform=x64 `
-        -p:Version=$Version4 `
-        -p:PublishDir="$PublishDir" `
-        -p:AppEnvironment=$Environment
-    
+    # Culture가 없으면 wixproj 기본값(en-US)으로 빌드 → suffix는 "en"으로 고정
+    $effectiveCulture = if ($Culture) { $Culture } else { "en-US" }
+    $cultureSuffix = ($effectiveCulture -split "-")[0].ToLowerInvariant()
+
+    $outputName = "LGCNS-axink-$Version4-$Environment-$cultureSuffix"
+
+    Write-Host "  Culture: $effectiveCulture (suffix=$cultureSuffix)" -ForegroundColor Cyan
+
+    $buildArgs = @(
+        "$SolutionDir\Setup\LGCNS.axink.MSI\LGCNS.axink.MSI.wixproj"
+        "-c", "Release"
+        "-p:Platform=x64"
+        "-p:Version=$Version4"
+        "-p:PublishDir=$PublishDir"
+        "-p:AppEnvironment=$Environment"
+        "-p:OutputName=$outputName"
+    )
+
+    if ($Culture) {
+        $buildArgs += "-p:Cultures=$Culture"
+    }
+
+    dotnet build @buildArgs
+
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     # MSI를 releases 폴더로 복사
     New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
-    $msiFile = Get-ChildItem "$SolutionDir\Setup\LGCNS.axink.MSI\bin\x64\Release\ko-KR\*.msi" |
+    $msiSearchRoot = "$SolutionDir\Setup\LGCNS.axink.MSI\bin\x64\Release"
+    $msiFile = Get-ChildItem -Path $msiSearchRoot -Filter "$outputName.msi" -Recurse |
+               Sort-Object LastWriteTime -Descending |
                Select-Object -First 1
 
     if ($msiFile) {
         Copy-Item $msiFile.FullName $OutputDir
         Write-Host "`nMSI 복사 완료: $OutputDir\$($msiFile.Name)" -ForegroundColor Green
     } else {
-        Write-Error "MSI 파일을 찾을 수 없습니다."
+        Write-Error "MSI 파일을 찾을 수 없습니다: $msiSearchRoot\$outputName.msi"
         exit 1
     }
     

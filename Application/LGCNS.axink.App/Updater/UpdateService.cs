@@ -1,4 +1,5 @@
 ﻿using LGCNS.axink.Common;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -48,10 +49,10 @@ namespace LGCNS.axink.App.Updater
                 var currentVersion = RegistryUtils.ReadVersion();
                 var companyCode = RegistryUtils.ReadCompanyCode();
                 //MSI는 회사별도 동일하게 운영되므로 LGCNS로 고정(향후 회사별로 변경되면 이부분 제거)
-                companyCode = "GIM006"; 
+                companyCode = "GIM006";
                 var url = string.Format(_updateCheckUrl, companyCode, "MSI");
                 var updateInfo = await ApiClient.GetAsync<UpdateInfo>(url);
-
+                Logging.Info($"업데이트 버전 - {JsonConvert.SerializeObject(updateInfo)}");
                 if (updateInfo == null)
                 {
                     SetStatus(UpdateStatus.UpToDate);
@@ -62,7 +63,6 @@ namespace LGCNS.axink.App.Updater
 
                 var latest = NormalizeVersion(updateInfo.VersionCode);
                 var current = NormalizeVersion(currentVersion);
-
                 if (current >= latest)
                 {
                     SetStatus(UpdateStatus.UpToDate);
@@ -140,17 +140,17 @@ namespace LGCNS.axink.App.Updater
                            $"--download-url \"{LatestUpdate.DownloadUrl}\" " +
                            $"--app \"{appExePath}\" " +
                            $"--version \"{LatestUpdate.VersionCode}\" ";
-                
-                           //(string.IsNullOrEmpty(LatestUpdate.FileHash)
-                           //    ? ""
-                           //    : $"--hash \"{LatestUpdate.FileHash}\" ") +
-                           //$"--cleanup";
+
+                //(string.IsNullOrEmpty(LatestUpdate.FileHash)
+                //    ? ""
+                //    : $"--hash \"{LatestUpdate.FileHash}\" ") +
+                //$"--cleanup";
 
                 // ── Updater 실행 (TEMP 경로에서) ──
                 var process = Process.Start(new ProcessStartInfo
                 {
                     FileName = tempUpdaterPath,
-                    Arguments = args,                    
+                    Arguments = args,
                     WorkingDirectory = tempUpdaterDir
                 });
 

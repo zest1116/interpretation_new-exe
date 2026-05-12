@@ -38,6 +38,10 @@ namespace LGCNS.axink.Models.Settings
 
         public AppTheme AppTheme { get; set; }
 
+        public bool OutputDeviceDisabled { get; set; }
+
+        public bool InputDeviceDisabled { get; set; }
+
 
     }
 }

@@ -1,0 +1,18 @@
+﻿<!--
+This file contains the declaration of all the localizable strings.
+-->
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="ko-KR" Codepage="949">
+
+	<!-- 자동 실행 체크박스 -->
+	<String Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="프로그램 실행" />
+
+	<String Id="DowngradeError" Value="최신 버전이 이미 설치되어 있습니다." />
+	<String Id="LanguageCode" Value="1042" Overridable="yes" />
+	<String Id="Codepage" Value="949" Overridable="yes" />
+	<String Id="SummaryDescription" Value="a:xink Translator 설치 프로그램" />
+	<String Id="WixUILicenseRtf" Value="License.ko-KR.rtf" Overridable="yes" />
+	<String Id="ShortcutDescriptionRun" Value="a:xink Translator 실행" />
+	<String Id="ShortcutNameUninstall" Value="axink Translator 제거" />
+	<String Id="ShortcutDescriptionUninstall" Value="a:xink Translator 제거" />
+
+</WixLocalization>

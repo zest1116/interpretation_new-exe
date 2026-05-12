@@ -47,5 +47,17 @@ namespace LGCNS.axink.Common
         /// 오디오 패킷 정의
         /// </summary>
         public const byte AUDIO_PACKET_PCM16 = 1;
+
+        /// <summary>
+        /// 스피커 장치 사용여부
+        /// 실제 장치 ID와 충돌하지 않도록 sentinel 사용
+        /// </summary>
+        public const string DISABLED_OUTPUT_ID = "__axink_disabled_output__";
+
+        /// <summary>
+        /// 마이크 장치 사용여부
+        /// 실제 장치 ID와 충돌하지 않도록 sentinel 사용
+        /// </summary>
+        public const string DISABLED_INPUT_ID = "__axink_disabled_input__";
     }
 }

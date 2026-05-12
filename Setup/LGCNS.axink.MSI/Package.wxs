@@ -16,20 +16,55 @@
 			 Compressed="yes"
 			 InstallerVersion="500"
 			 Scope="perUser"
-			 Language="1042"
-			 Codepage="949">
+			 Language="!(loc.LanguageCode)"
+			 Codepage="!(loc.Codepage)">
 
 		<!-- 요약 정보 -->
 		<SummaryInformation
-			Description="$(DisplayName) 설치 프로그램"
+			Description="!(loc.SummaryDescription)"
             Manufacturer="$(Manufacturer)" />
 
-		<!-- ★ 업그레이드 핵심 설정 ★ -->
-		<MajorUpgrade
-			Schedule="afterInstallInitialize"
-			DowngradeErrorMessage="최신 버전이 이미 설치되어 있습니다."
-			AllowSameVersionUpgrades="yes" />
+		<!-- ★ 업그레이드 핵심 설정 (다국어 MSI 대응) ★ -->
+		<Upgrade Id="$(UpgradeCode)">
+			<!-- 이전 버전 검색: 모든 언어 LCID 명시 -->
+			<UpgradeVersion
+				Minimum="0.0.0.0"
+				IncludeMinimum="yes"
+				Maximum="!(bind.fileVersion.MainExeFile)"
+				IncludeMaximum="no"
+				Language="1033,1042,2052"
+				Property="OLDER_VERSION_FOUND"
+				MigrateFeatures="yes" />
 
+			<!-- 같은 버전 재설치 허용 -->
+			<UpgradeVersion
+				Minimum="!(bind.fileVersion.MainExeFile)"
+				IncludeMinimum="yes"
+				Maximum="!(bind.fileVersion.MainExeFile)"
+				IncludeMaximum="yes"
+				Language="1033,1042,2052"
+				Property="SAME_VERSION_FOUND"
+				MigrateFeatures="yes" />
+
+			<!-- 다운그레이드 차단: 새 버전 탐지 -->
+			<UpgradeVersion
+				Minimum="!(bind.fileVersion.MainExeFile)"
+				IncludeMinimum="no"
+				OnlyDetect="yes"
+				Language="1033,1042,2052"
+				Property="NEWER_VERSION_FOUND" />
+		</Upgrade>
+
+		<!-- 다운그레이드 차단 메시지 -->
+		<Launch
+			Condition="NOT NEWER_VERSION_FOUND"
+			Message="!(loc.DowngradeError)" />
+
+		<!-- RemoveExistingProducts 시점 (per-user 같은 폴더 설치에 적합) -->
+		<InstallExecuteSequence>
+			<RemoveExistingProducts After="InstallInitialize" />
+		</InstallExecuteSequence>
+		
 		<!-- 단일 MSI 파일로 압축 -->
 		<MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
@@ -44,10 +79,10 @@
 		</UI>
 
 		<!-- UI 리소스 -->
-		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
 		<WixVariable Id="WixUIDialogBmp" Value="WixUIDialogBmp.bmp" />
 		<WixVariable Id="WixUIBannerBmp" Value="WixUIBannerBmp.bmp" />
-
+		<WixVariable Id="WixUILicenseRtf" Value="!(loc.WixUILicenseRtf)" />
+		
 		<!-- 제어판 아이콘 -->
 		<Icon Id="ProductIcon" SourceFile="ProductIcon.ico" />
 		<Property Id="ARPPRODUCTICON" Value="ProductIcon" />
@@ -55,7 +90,6 @@
 		<Property Id="ARPURLINFOABOUT" Value="https://www.lgcns.com/" />
 				
 		<!-- 설치 후 앱 실행 옵션 -->
-		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(DisplayName) 실행" />
 		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
 
 		<!-- 실행 대상 지정 -->

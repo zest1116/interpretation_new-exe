@@ -68,22 +68,26 @@ namespace LGCNS.axink.Common
         }
 
         /// <summary>
-        /// source(시드)의 값을 target에 병합
-        /// target이 null/empty이면 source 값으로 채움
+        /// source(시드)의 값을 target의 "비어있는" 항목에만 병합
+        /// 사용자가 설정한 값(non-default)은 보존
         /// </summary>
         private static void MergeDefaults(T source, T target)
         {
+            var blank = new T();  // 비교 기준점
+
             foreach (var prop in typeof(T).GetProperties())
             {
                 if (!prop.CanRead || !prop.CanWrite) continue;
 
                 var targetVal = prop.GetValue(target);
                 var sourceVal = prop.GetValue(source);
+                var blankVal = prop.GetValue(blank);
 
-                //var isEmpty = targetVal is null
-                //           || (targetVal is string s && string.IsNullOrEmpty(s));
+                // target이 "기본값(blank)"과 같을 때만 source로 채움
+                bool targetIsBlank = Equals(targetVal, blankVal)
+                                  || (targetVal is string s && string.IsNullOrEmpty(s));
 
-                if (sourceVal is not null)
+                if (targetIsBlank && sourceVal is not null)
                 {
                     prop.SetValue(target, sourceVal);
                 }

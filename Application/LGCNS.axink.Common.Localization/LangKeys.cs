@@ -32,6 +32,7 @@ namespace LGCNS.axink.Common.Localization
         public const string Dic_Device_Mic = nameof(Dic_Device_Mic);
         public const string Dic_Device_Mic_SubTitle = nameof(Dic_Device_Mic_SubTitle);
         public const string Dic_Device_Default = nameof(Dic_Device_Default);
+        public const string Dic_Device_Disabled = nameof(Dic_Device_Disabled);
         public const string Msg_Notification_Speaker = nameof(Msg_Notification_Speaker);
         public const string Msg_Notification_Mic = nameof(Msg_Notification_Mic);
         public const string Msg_Notification_Device_Added = nameof(Msg_Notification_Device_Added);

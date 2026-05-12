@@ -91,6 +91,8 @@ namespace LGCNS.axink.App.Services
             _enableMicCapture = dt == "all" || dt == "input";
             _enableSpkCapture = dt == "all" || dt == "output";
 
+            if (_sysSettings?.Current.InputDeviceDisabled == true) _enableMicCapture = false;
+            if (_sysSettings?.Current.OutputDeviceDisabled == true) _enableSpkCapture = false;
 
             // ✅ 이전 실행이 남아있다면 안전하게 정리 (중복 start 방지)
             await StopAsync(ct);

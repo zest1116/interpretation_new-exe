@@ -48,7 +48,7 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceItemBorderBrush}"/>
             </Trigger>
 
-            <DataTrigger Binding="{Binding IsDefault}" Value="True">
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
                 <Setter Property="Background" Value="{DynamicResource DeviceSelectedBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceSelectedBorderBrush}"/>
             </DataTrigger>
@@ -64,12 +64,13 @@
     </Style>
 
     <!-- 장치 아이템 템플릿 -->
+    <!-- 장치 아이템 템플릿 -->
     <DataTemplate x:Key="ModernDeviceItemTemplate">
         <Border Style="{StaticResource ModernDeviceItemBorderStyle}">
             <Border.InputBindings>
                 <MouseBinding Gesture="LeftClick"
-                      Command="{Binding SelectDeviceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                      CommandParameter="{Binding}" />
+                  Command="{Binding SelectDeviceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                  CommandParameter="{Binding}" />
             </Border.InputBindings>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -79,22 +80,22 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- 좌측 상태 -->
+                <!-- 좌측 상태 (라디오) -->
                 <Border Grid.Column="0"
-                        Width="34"
-                        Height="34"
-                        CornerRadius="17"
-                        Background="{DynamicResource PanelSubtleBackgroundBrush}"
-                        VerticalAlignment="Center">
+                    Width="34"
+                    Height="34"
+                    CornerRadius="17"
+                    Background="{DynamicResource PanelSubtleBackgroundBrush}"
+                    VerticalAlignment="Center">
                     <Ellipse Width="10"
-                             Height="10"
-                             HorizontalAlignment="Center"
-                             VerticalAlignment="Center">
+                         Height="10"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center">
                         <Ellipse.Style>
                             <Style TargetType="Ellipse">
                                 <Setter Property="Fill" Value="{DynamicResource DeviceStatusIdleBrush}"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                         <Setter Property="Fill" Value="{DynamicResource AccentBrush}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -106,15 +107,15 @@
                 <!-- 텍스트 -->
                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
                     <TextBlock Text="{Binding Endpoint}"
-                               FontSize="14"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource DeviceTextNormalBrush}"
-                               TextTrimming="CharacterEllipsis">
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource DeviceTextNormalBrush}"
+                           TextTrimming="CharacterEllipsis">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource DeviceTextNormalBrush}"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                         <Setter Property="Foreground" Value="{DynamicResource DeviceTextDefaultBrush}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -123,15 +124,14 @@
                     </TextBlock>
 
                     <TextBlock Text="{Binding DeviceFriendlyName}" Margin="0,2,0,0"
-                               FontSize="12"
-                               Foreground="{DynamicResource TextSecondaryBrush}">
+                           FontSize="12"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Visibility="{Binding ShowSubtitle, Converter={StaticResource BoolToVis}}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
-                                <!--<Setter Property="Text" Value="클릭하여 기본 장치로 설정"/>-->
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
-                                        <!--<Setter Property="Text" Value="현재 기본 장치로 사용 중"/>-->
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                         <Setter Property="Foreground" Value="{DynamicResource DeviceTextDefaultBrush}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -142,13 +142,14 @@
 
                 <!-- 기본 장치 배지 -->
                 <Border Grid.Column="3"
-                        Style="{StaticResource DeviceDefaultBadgeStyle}"
-                        Margin="12,0,0,0"
-                        Visibility="{Binding IsDefault, Converter={StaticResource BoolToVis}}">
+                    Style="{StaticResource DeviceDefaultBadgeStyle}"
+                    Margin="12,0,0,0"
+                    Opacity="{Binding DefaultBadgeOpacity}"
+                    Visibility="{Binding ShowDefaultBadge, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{DynamicResource Dic_Device_Default}"
-                               FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource DeviceBadgeForegroundBrush}"/>
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource DeviceBadgeForegroundBrush}"/>
                 </Border>
             </Grid>
         </Border>
