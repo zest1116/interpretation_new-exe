@@ -13,7 +13,7 @@ $ErrorActionPreference = "Stop"
 $SolutionDir = Split-Path $PSScriptRoot -Parent
 $PublishDir = (Join-Path $SolutionDir "Publish").TrimEnd('\')
 $UpdaterOutput = (Join-Path $SolutionDir "Publish_Updater").TrimEnd('\')
-$OutputDir = Join-Path $SolutionDir "releases"
+$OutputDir = Join-Path $SolutionDir "Releases"
 
 if ($Version -notmatch '^\d+\.\d+\.\d+$') {
     Write-Error "버전 형식이 잘못되었습니다. 예: 1.0.0"

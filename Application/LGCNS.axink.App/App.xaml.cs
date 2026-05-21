@@ -127,7 +127,7 @@ namespace LGCNS.axink.App
 
                 return store;
             });
-           
+
             sc.AddSingleton(sp => new JsonFileStore<UserSettings>(Consts.APP_NAME, Consts.FILE_NAME_USER_SETTINGS));
             sc.AddSingleton(sp => new JsonFileStore<SystemSettings>(Consts.APP_NAME, Consts.FILE_NAME_SYS_SETTINGS));
 
@@ -275,7 +275,8 @@ namespace LGCNS.axink.App
             {
                 var tenant = await CheckCompany(appSettingsMon.Current.TenantListUrl, CompanyCode);
 
-                if (tenant != null) {
+                if (tenant != null)
+                {
                     var main = new MainWindow(userSettingsMon, systemSettingsMon, appSettingsMon, messenger, deviceService, deviceChangeHub, webViewBridge, tenant);
                     MainWindow = main;
                     main.Show();
@@ -286,6 +287,7 @@ namespace LGCNS.axink.App
                         title: Application.Current.Resources["Msg_Not_Found_CompanyInfo"].ToString() ?? "회사정보를 가져오지 못했습니다.",
                         message: "",
                         dialogTitle: Application.Current.Resources["Dic_Common_Information"].ToString());
+                    Shutdown();
                 }
             }
             else
@@ -323,6 +325,9 @@ namespace LGCNS.axink.App
                 MessageBox.Show($"Task 예외: {e.Exception}");
                 e.SetObserved();
             };
+
+            // 오래된 로그 정리 (백그라운드, 시작 지연 방지)
+            _ = Task.Run(() => LogCleaner.CleanOldLogs());
         }
 
         /// <summary>
@@ -396,9 +401,17 @@ namespace LGCNS.axink.App
 
         private async Task<TenantInfo?> CheckCompany(string tenantListUrl, string companyCode)
         {
-            var tenants = await ApiClient.GetAsync<List<TenantInfo>>(tenantListUrl);
+            try
+            {
+                var tenants = await ApiClient.GetAsync<List<TenantInfo>>(tenantListUrl);
 
-            return tenants?.Find(x => x.CompanyCd.Equals(companyCode, StringComparison.OrdinalIgnoreCase));
+                return tenants?.Find(x => x.CompanyCd.Equals(companyCode, StringComparison.OrdinalIgnoreCase));
+            }
+            catch (Exception ex)
+            {
+                Logging.Error($"회사정보를 가져오지 못했습니다. {ex.Message}");
+                return null;
+            }
         }
 
 

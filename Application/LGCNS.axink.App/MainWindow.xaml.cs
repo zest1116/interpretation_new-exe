@@ -2,6 +2,7 @@
 using LGCNS.axink.App.Services;
 using LGCNS.axink.App.Windows;
 using LGCNS.axink.Common;
+using LGCNS.axink.Common.Localization;
 using LGCNS.axink.Common.Monitors;
 using LGCNS.axink.Models.ApiResponse;
 using LGCNS.axink.Models.Devices;
@@ -184,7 +185,7 @@ namespace LGCNS.axink.App
                         Application.Current.Shutdown();
                     }
                 }
-                else if(type == "changeTheme")
+                else if (type == "changeTheme")
                 {
                     JToken? data = msg["data"];
                     if (data != null)
@@ -199,7 +200,7 @@ namespace LGCNS.axink.App
                                 ThemeManager.Apply(AppTheme.Light);
                                 appTheme = AppTheme.Light;
                                 break;
-    
+
                             case "BLACK":
                                 ThemeManager.Apply(AppTheme.Dark);
                                 appTheme = AppTheme.Dark;
@@ -212,6 +213,16 @@ namespace LGCNS.axink.App
 
                         SyncThemeMenu();
 
+                    }
+                }
+                else if (type == "changeSystemLanguage")
+                {
+                    JToken? data = msg["data"];
+                    if (data != null)
+                    {
+                        var lang = data.Value<string>("language") ?? "en";
+
+                        LocalizationManager.Instance.SetLanguage(lang);
                     }
                 }
                 else
@@ -376,7 +387,7 @@ namespace LGCNS.axink.App
                     }
                 }
 
-                
+
                 UpdateVisualState();
 
             }
@@ -654,7 +665,7 @@ namespace LGCNS.axink.App
             return IntPtr.Zero;
         }
 
-        private  void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
+        private void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
         {
             var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
 

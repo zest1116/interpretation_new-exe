@@ -41,17 +41,29 @@ namespace LGCNS.axink.App.Windows
         {
             if (!string.IsNullOrEmpty(tenantListUrl))
             {
-                var tenants = await ApiClient.GetAsync<List<TenantInfo>>(tenantListUrl);
-
-                CmbCompanies.ItemsSource = tenants;
-
-                if (!string.IsNullOrEmpty(companyCode))
+                try
                 {
-                    var selectedCompany = tenants?.Find(x => x.CompanyCd == companyCode);
-                    if (selectedCompany != null)
+                    var tenants = await ApiClient.GetAsync<List<TenantInfo>>(tenantListUrl);
+
+                    CmbCompanies.ItemsSource = tenants;
+
+                    if (!string.IsNullOrEmpty(companyCode))
                     {
-                        CmbCompanies.SelectedItem = selectedCompany;
+                        var selectedCompany = tenants?.Find(x => x.CompanyCd == companyCode);
+                        if (selectedCompany != null)
+                        {
+                            CmbCompanies.SelectedItem = selectedCompany;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    AlertDialog.ShowOk(Application.Current.MainWindow,
+                        title: Application.Current.Resources["Msg_Not_Found_CompanyInfo"].ToString() ?? "회사정보를 가져오지 못했습니다.",
+                        message: "",
+                        dialogTitle: Application.Current.Resources["Dic_Common_Information"].ToString());
+                    Logging.Error($"회사정보를 가져오지 못했습니다. {ex.Message}");
+                    Application.Current.Shutdown();
                 }
             }
 

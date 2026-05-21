@@ -14,7 +14,7 @@ namespace LGCNS.axink.Common.Localization
         public static LocalizationManager Instance => _instance.Value;
 
         private const string DictionaryUriBase =
-            "pack://application:,,,/Common.Localization;component/Languages/Strings.{0}.xaml";
+            "pack://application:,,,/LGCNS.axink.Common.Localization;component/Languages/Strings.{0}.xaml";
 
         private string _currentLang = "ko";
 

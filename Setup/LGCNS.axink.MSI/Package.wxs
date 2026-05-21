@@ -71,6 +71,7 @@
 		<!-- 설치 UI -->
 		<UI>
 			<ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+			<UIRef Id="WixUI_ErrorProgressText" />
 			<Publish Dialog="ExitDialog"
              Control="Finish"
              Event="DoAction"
