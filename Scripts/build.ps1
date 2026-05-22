@@ -113,6 +113,20 @@ if (Test-Path $envConfig) {
     Write-Host "  환경별 파일 없음, 기본값 사용" -ForegroundColor Gray
 }
 
+# Production 강제 정책: ShowMenubar = false
+if ($Environment -eq "Production") {
+    $base = Get-Content $baseConfig -Raw | ConvertFrom-Json
+
+    if (-not $base.AppSettings) {
+        $base | Add-Member -Force -MemberType NoteProperty -Name "AppSettings" -Value ([PSCustomObject]@{})
+    }
+
+    $base.AppSettings | Add-Member -Force -MemberType NoteProperty -Name "ShowMenubar" -Value $false
+
+    $base | ConvertTo-Json -Depth 10 | Set-Content $baseConfig -Encoding UTF8
+    Write-Host "  Production 정책 적용: ShowMenubar=false" -ForegroundColor Green
+}
+
 # 환경별 파일 제거 (배포에 불필요)
 Remove-Item "$PublishDir\appsettings.*.json" -Force -ErrorAction SilentlyContinue
 Write-Host "  환경별 파일 정리 완료" -ForegroundColor Green
